@@ -1,3 +1,5 @@
+"use client"; // Mark the file as a client component
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,29 +24,51 @@ import {
   ShoppingCart,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { use } from 'react'; // Import use from React
 
-async function getProduct(id: string) {
-  try {
-    // In a real application, this would be a fetch to your API
-    const res = await fetch(`/api/admin/products/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch product');
-    return res.json();
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    return null;
-  }
+// Define the type for params
+interface Params {
+  id: string;
 }
 
-export default async function ProductDetailPage({
+export default function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Params; // Use the defined Params type
 }) {
-  const { id } = await params;
-  const product = await getProduct(id);
+  const unwrappedParams = use(params);
+  console.log(unwrappedParams); // Log the unwrapped params
+  const [product, setProduct] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/admin/products/${unwrappedParams.id}`); // Use unwrappedParams.id
+
+        if (!response.ok) {
+          throw new Error('Không thể tải sản phẩm');
+        }
+
+        const data = await response.json();
+        setProduct(data);
+      } catch (error) {
+        console.error('Lỗi khi tải sản phẩm:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [unwrappedParams.id]); // Run effect when unwrappedParams.id changes
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show loading state
+  }
 
   if (!product) {
-    notFound();
+    notFound(); // If product not found
   }
 
   return (

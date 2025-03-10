@@ -41,9 +41,9 @@ export async function PUT(
 
     // Cập nhật danh mục
     const { data: category, error } = await supabase
-      .from('categories')
+      .from("product_categories")
       .update(categoryData)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -78,7 +78,7 @@ export async function DELETE(
   
       const { id } = await params;
   
-      const { error } = await supabase.from('categories').delete().eq('id', id);
+      const { error } = await supabase.from("product_categories").delete().eq("id", id);
   
       if (error) {
         console.error('Error deleting category:', error);
@@ -111,9 +111,9 @@ export async function GET(
     const { id } = await params;
 
     const { data: category, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('id', id)
+      .from("product_categories")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {

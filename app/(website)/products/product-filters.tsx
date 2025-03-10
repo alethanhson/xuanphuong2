@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import type { Database } from "@/types/supabase"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -12,30 +12,23 @@ import { Separator } from "@/components/ui/separator"
 import { ChevronDown, ChevronUp, Filter } from "lucide-react"
 
 interface ProductFiltersProps {
+  categories: Database['public']['Tables']['product_categories']['Row'][]
   selectedCategory?: string
   searchQuery?: string
   sortBy?: string
 }
 
-export default function ProductFilters({ selectedCategory, searchQuery = "", sortBy = "newest" }: ProductFiltersProps) {
+const sortOptions = [
+  { id: "newest", name: "Mới nhất" },
+  { id: "price-asc", name: "Giá: Thấp đến cao" },
+  { id: "price-desc", name: "Giá: Cao đến thấp" },
+  { id: "popular", name: "Phổ biến nhất" },
+] as const
+
+export default function ProductFilters({ categories, selectedCategory, searchQuery = "", sortBy = "newest" }: ProductFiltersProps) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(searchQuery)
-
-  const categories = [
-    { id: "all", name: "Tất cả sản phẩm", slug: "" },
-    { id: "wood", name: "Máy CNC Gỗ", slug: "wood" },
-    { id: "metal", name: "Máy CNC Kim Loại", slug: "metal" },
-    { id: "laser", name: "Máy CNC Laser", slug: "laser" },
-    { id: "accessories", name: "Phụ Kiện CNC", slug: "accessories" },
-  ]
-
-  const sortOptions = [
-    { id: "newest", name: "Mới nhất" },
-    { id: "price-asc", name: "Giá: Thấp đến cao" },
-    { id: "price-desc", name: "Giá: Cao đến thấp" },
-    { id: "popular", name: "Phổ biến nhất" },
-  ]
 
   const handleCategoryChange = (slug: string) => {
     const params = new URLSearchParams()
@@ -122,6 +115,7 @@ export default function ProductFilters({ selectedCategory, searchQuery = "", sor
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               className="flex-1"
+              aria-label="Tìm kiếm sản phẩm"
             />
             <Button type="submit" size="sm">
               Tìm
@@ -135,15 +129,29 @@ export default function ProductFilters({ selectedCategory, searchQuery = "", sor
         <div>
           <h3 className="text-lg font-semibold mb-3">Danh mục</h3>
           <div className="space-y-2">
+            <div
+              className={`cursor-pointer py-1 px-2 rounded-md transition-colors ${
+                !selectedCategory ? "bg-primary/10 text-primary font-medium" : "hover:bg-zinc-100"
+              }`}
+              onClick={() => handleCategoryChange("")}
+              role="button"
+              tabIndex={0}
+              aria-label="Hiển thị tất cả sản phẩm"
+            >
+              Tất cả sản phẩm
+            </div>
             {categories.map((category) => (
               <div
                 key={category.id}
                 className={`cursor-pointer py-1 px-2 rounded-md transition-colors ${
-                  (category.slug === selectedCategory) || (category.slug === "" && !selectedCategory)
+                  category.slug === selectedCategory
                     ? "bg-primary/10 text-primary font-medium"
                     : "hover:bg-zinc-100"
                 }`}
                 onClick={() => handleCategoryChange(category.slug)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Lọc theo danh mục ${category.name}`}
               >
                 {category.name}
               </div>

@@ -1,4 +1,5 @@
 import type { FilterParams } from "./common"
+import type { Database } from './supabase'
 
 export interface ProductCategory {
   id: string
@@ -38,61 +39,29 @@ export interface ProductReview {
   avatar?: string
 }
 
-export interface Product {
-  id: string
-  name: string
-  slug: string
-  description: string
-  shortDescription?: string
-  categoryId: string
-  category?: ProductCategory
-  price?: number | null // null means "contact for price"
-  priceFormatted?: string
-  images: ProductImage[]
-  features?: ProductFeature[]
-  specifications?: ProductSpecification[]
-  reviews?: ProductReview[]
-  isFeatured?: boolean
-  createdAt: string
-  updatedAt: string
-
-  // Additional properties
-  model?: string
-  workingDimensions?: string
-  spindlePower?: string
-  spindleSpeed?: string
-  movementSpeed?: string
-  accuracy?: string
-  controlSystem?: string
-  compatibleSoftware?: string
-  fileFormats?: string
-  powerConsumption?: string
-  machineDimensions?: string
-  weight?: string
-  applications?: {
-    furniture?: string
-    interiorDecoration?: string
-    advertising?: string
-    woodIndustry: string[]
-    advertisingIndustry: string[]
-  }
+export type Product = Database['public']['Tables']['products']['Row'] & {
+  category?: Database['public']['Tables']['product_categories']['Row']
+  images?: Database['public']['Tables']['product_images']['Row'][]
+  features?: Database['public']['Tables']['product_features']['Row'][]
+  specifications?: Database['public']['Tables']['product_specifications']['Row'][]
 }
 
 export interface ProductsResponse {
-  products: Product[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  data?: {
+    products: Product[]
+    total: number
+    totalPages: number
+  }
+  error?: {
+    message: string
+  }
 }
 
-export interface ProductFilters extends FilterParams {
-  categoryId?: string
+export interface ProductFilters {
   categorySlug?: string
   search?: string
-  featured?: boolean
   page?: number
   limit?: number
-  sortBy?: "newest" | "price-asc" | "price-desc" | "popular"
+  sortBy?: 'newest' | 'price-asc' | 'price-desc' | 'popular'
 }
 

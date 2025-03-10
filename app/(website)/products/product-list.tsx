@@ -1,8 +1,8 @@
-import { ProductService } from "@/lib/api-services"
+import { ProductService } from "@/lib/services/product.service"
+import type { Product } from "@/types/product"
 import ProductCard from "@/components/product-card"
 import ProductSearch from "./product-search"
 import Pagination from "@/components/pagination"
-import type { ProductFilters } from "@/types/product"
 
 interface ProductListProps {
   categorySlug?: string
@@ -13,7 +13,7 @@ interface ProductListProps {
 
 export default async function ProductList({ categorySlug, search, page = 1, sortBy = "newest" }: ProductListProps) {
   // Prepare filters
-  const filters: ProductFilters = {
+  const filters = {
     categorySlug,
     search,
     page,
@@ -52,13 +52,18 @@ export default async function ProductList({ categorySlug, search, page = 1, sort
       {/* Products */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard 
+            key={product.id} 
+            product={product}
+          />
         ))}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination currentPage={page} totalPages={totalPages} baseUrl="/products" preserveParams={true} />
+        <div className="mt-8">
+          <Pagination currentPage={page} totalPages={totalPages} baseUrl="/products" preserveParams={true} />
+        </div>
       )}
     </>
   )

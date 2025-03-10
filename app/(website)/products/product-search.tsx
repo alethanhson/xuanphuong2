@@ -1,10 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,6 +12,13 @@ interface ProductSearchProps {
   initialSearch?: string
   initialSortBy?: string
 }
+
+const sortOptions = [
+  { id: "newest", name: "Mới nhất" },
+  { id: "price-asc", name: "Giá: Thấp đến cao" },
+  { id: "price-desc", name: "Giá: Cao đến thấp" },
+  { id: "popular", name: "Phổ biến nhất" },
+] as const
 
 export default function ProductSearch({ initialSearch = "", initialSortBy = "newest" }: ProductSearchProps) {
   const router = useRouter()
@@ -55,6 +60,7 @@ export default function ProductSearch({ initialSearch = "", initialSortBy = "new
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pr-10"
+          aria-label="Tìm kiếm sản phẩm"
         />
         <Button type="submit" variant="ghost" size="icon" className="absolute right-0 top-0 h-full">
           <Search className="h-4 w-4" />
@@ -65,14 +71,15 @@ export default function ProductSearch({ initialSearch = "", initialSortBy = "new
       <div className="flex items-center gap-2 w-full md:w-auto">
         <span className="text-sm text-zinc-500 whitespace-nowrap">Sắp xếp theo:</span>
         <Select value={initialSortBy} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-full md:w-[180px]">
+          <SelectTrigger className="w-full md:w-[180px]" aria-label="Sắp xếp sản phẩm">
             <SelectValue placeholder="Sắp xếp theo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">Mới nhất</SelectItem>
-            <SelectItem value="price-asc">Giá: Thấp đến cao</SelectItem>
-            <SelectItem value="price-desc">Giá: Cao đến thấp</SelectItem>
-            <SelectItem value="popular">Phổ biến nhất</SelectItem>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.id} value={option.id}>
+                {option.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

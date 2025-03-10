@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase"
+import { supabase } from '@/lib/supabaseClient';
 import Cookies from 'js-cookie'
 
 const formSchema = z.object({

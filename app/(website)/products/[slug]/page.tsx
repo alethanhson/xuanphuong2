@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
-import { ProductService } from "@/lib/api-services"
+import { ProductService } from "@/lib/product-service"
 import ProductDetail from "./product-detail"
 import ProductDetailLoading from "./loading"
 import RelatedProducts from "./related-products"
@@ -14,38 +14,76 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Generate metadata dynamically based on product
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const response = await ProductService.getProductBySlug(params.slug)
+  try {
+    console.log('Generating metadata for slug:', params.slug);
+    const response = await ProductService.getProductBySlug(params.slug)
 
-  if (response.error || !response.data) {
-    return {
-      title: "Sản phẩm không tồn tại | CNC Future",
-      description: "Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+    if (response.error || !response.data) {
+      console.error('Error generating metadata:', response.error?.message || 'No product data');
+      return {
+        title: "Sản phẩm không tồn tại | CNC Future",
+        description: "Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+      }
     }
-  }
 
-  const product = response.data
+    console.log('Metadata generation: product found:', response.data.name);
+    const product = response.data
 
-  return {
-    title: `${product.name} | CNC Future`,
-    description: product.shortDescription || product.description.substring(0, 160),
-    openGraph: {
-      title: `${product.name} | CNC Future`,
-      description: product.shortDescription || product.description.substring(0, 160),
-      type: "website",
-    },
+    // Ensure we have valid data for metadata
+    const productName = product.name || 'Sản phẩm CNC';
+    const productDescription = product.short_description ||
+      (product.description ? product.description.substring(0, 160) : 'Sản phẩm CNC chất lượng cao');
+
+    // Get the primary image or the first image if available
+    const productImage = product.images && product.images.length > 0 ?
+      product.images.find(img => img.is_primary) || product.images[0] : null;
+
+    return {
+      title: `${productName} | CNC Future`,
+      description: productDescription,
+      openGraph: {
+        title: `${productName} | CNC Future`,
+        description: productDescription,
+        type: "website",
+        images: productImage ? [
+          {
+            url: productImage.url,
+            width: 1200,
+            height: 630,
+            alt: productName,
+          }
+        ] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: productName,
+        description: productDescription,
+        images: productImage ? [productImage.url] : [],
+      },
+    };
+  } catch (error) {
+    console.error('Error in generateMetadata:', error);
+    return {
+      title: "Sản phẩm | CNC Future",
+      description: "Xem chi tiết sản phẩm CNC chất lượng cao tại CNC Future.",
+    };
   }
 }
 
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const response = await ProductService.getProductBySlug(params.slug)
+  try {
+    console.log('Fetching product detail for slug:', params.slug);
+    const response = await ProductService.getProductBySlug(params.slug)
 
-  if (response.error || !response.data) {
-    notFound()
-  }
+    if (response.error || !response.data) {
+      console.error('Product not found or error:', response.error?.message || 'No data');
+      notFound()
+    }
 
-  const product = response.data
+    console.log('Product fetched successfully:', response.data.name);
+    const product = response.data
 
-  return (
+    return (
     <>
       {/* Breadcrumb */}
       <div className="bg-zinc-100 py-3">
@@ -390,5 +428,9 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
       </Suspense>
     </>
   )
+  } catch (error) {
+    console.error('Unexpected error in product detail page:', error);
+    notFound()
+  }
 }
 

@@ -48,13 +48,57 @@ export default function LoginPage() {
         throw error
       }
 
-      Cookies.set("user", JSON.stringify(data.user))
+      // Kiểm tra quyền admin
+      let isAdmin = false;
+
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+
+        // Nếu email là xuanphuong@gmail.com, cho phép truy cập ngay cả khi bảng profiles chưa tồn tại
+        if (values.email === 'xuanphuong@gmail.com') {
+          isAdmin = true;
+
+          // Nếu bảng profiles tồn tại nhưng chưa có role admin, cập nhật role
+          if (!profileError && profileData && profileData.role !== 'admin') {
+            await supabase
+              .from('profiles')
+              .update({ role: 'admin' })
+              .eq('id', data.user.id);
+          }
+        } else if (!profileError && profileData && profileData.role === 'admin') {
+          isAdmin = true;
+        }
+      } catch (error) {
+        console.error('Error checking admin role:', error);
+        // Nếu lỗi là do bảng profiles không tồn tại và email là xuanphuong@gmail.com
+        if (values.email === 'xuanphuong@gmail.com') {
+          isAdmin = true;
+        } else {
+          throw new Error('Không thể lấy thông tin người dùng');
+        }
+      }
+
+      if (!isAdmin) {
+        throw new Error('Bạn không có quyền truy cập vào trang quản trị')
+      }
+
+      // Lưu thông tin user và role vào cookie
+      const userData = {
+        ...data.user,
+        role: 'admin' // Đã kiểm tra isAdmin = true ở trên
+      }
+
+      Cookies.set("user", JSON.stringify(userData))
 
       toast({
         title: "Đăng nhập thành công",
         description: "Chào mừng bạn quay trở lại!",
       })
-      
+
       router.push(redirectTo)
       router.refresh()
     } catch (error) {

@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const supabase = await createServerSupabaseClient()
 
-    const { data: categories, error } = await supabase.from("product_categories").select("*").order("name", { ascending: true })
+    const { data: categories, error } = await supabase.from("categories").select("*").order("name", { ascending: true })
 
     if (error) {
       console.error("Error fetching categories:", error)
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     categoryData.updated_at = now
 
     // Insert the category
-    const { data: category, error } = await supabase.from("product_categories").insert([categoryData]).select().single()
+    const { data: category, error } = await supabase.from("categories").insert([categoryData]).select().single()
 
     if (error) {
       console.error("Error creating category:", error)

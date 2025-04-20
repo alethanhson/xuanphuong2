@@ -9,6 +9,55 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          parent_id: string | null;
+          image_url: string | null;
+          is_active: boolean;
+          order_num: number;
+          type: string | null;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          description?: string | null;
+          parent_id?: string | null;
+          image_url?: string | null;
+          is_active?: boolean;
+          order_num?: number;
+          type?: string | null;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          description?: string | null;
+          parent_id?: string | null;
+          image_url?: string | null;
+          is_active?: boolean;
+          order_num?: number;
+          type?: string | null;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'categories_parent_id_fkey';
+            columns: ['parent_id'];
+            referencedRelation: 'categories';
+            referencedColumns: ['id'];
+          }
+        ];
+      },
       blog_categories: {
         Row: {
           id: string;

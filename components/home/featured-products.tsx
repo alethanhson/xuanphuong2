@@ -7,65 +7,62 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { homeImages } from "@/lib/placeholder-images"
+import type { Product } from "@/lib/data-service"
 
-// Mock data for featured products
-const featuredProducts = [
+// Fallback data in case no products are provided
+const fallbackProducts = [
   {
     id: "1",
     name: "CNC WoodMaster 500",
     slug: "cnc-woodmaster-500",
-    category: "Máy CNC Gỗ",
-    categorySlug: "wood",
+    category: { name: "Máy CNC Gỗ", slug: "wood" },
     description: "Máy CNC gỗ hiện đại với độ chính xác cao, tốc độ xử lý nhanh.",
-    image: homeImages.productWood1,
-    features: ["Kích thước làm việc: 1300 x 2500 x 200mm", "Công suất spindle: 5.5kW", "Tốc độ spindle: 24,000 rpm"],
+    images: [{ url: homeImages.productWood1, is_primary: true }],
+    features: [
+      { id: "1", title: "Kích thước làm việc", description: "1300 x 2500 x 200mm" },
+      { id: "2", title: "Công suất spindle", description: "5.5kW" },
+      { id: "3", title: "Tốc độ spindle", description: "24,000 rpm" },
+    ],
   },
   {
     id: "2",
     name: "CNC MetalPro 700",
     slug: "cnc-metalpro-700",
-    category: "Máy CNC Kim Loại",
-    categorySlug: "metal",
+    category: { name: "Máy CNC Kim Loại", slug: "metal" },
     description: "Máy CNC kim loại công suất lớn, gia công chính xác các chi tiết kim loại.",
-    image: homeImages.productMetal1,
-    features: ["Kích thước làm việc: 1500 x 3000 x 200mm", "Công suất spindle: 7.5kW", "Tốc độ spindle: 18,000 rpm"],
+    images: [{ url: homeImages.productMetal1, is_primary: true }],
+    features: [
+      { id: "1", title: "Kích thước làm việc", description: "1500 x 3000 x 200mm" },
+      { id: "2", title: "Công suất spindle", description: "7.5kW" },
+      { id: "3", title: "Tốc độ spindle", description: "18,000 rpm" },
+    ],
   },
   {
     id: "3",
     name: "CNC LaserTech 500",
     slug: "cnc-lasertech-500",
-    category: "Máy CNC Laser",
-    categorySlug: "laser",
+    category: { name: "Máy CNC Laser", slug: "laser" },
     description: "Máy CNC laser hiện đại, cho phép cắt và khắc với độ chính xác cực cao.",
-    image: homeImages.productLaser1,
-    features: ["Kích thước làm việc: 1300 x 900mm", "Công suất laser: 150W", "Tốc độ cắt: 0-40000mm/min"],
-  },
-  {
-    id: "4",
-    name: "CNC WoodMaster 900",
-    slug: "cnc-woodmaster-900",
-    category: "Máy CNC Gỗ",
-    categorySlug: "wood",
-    description: "Máy CNC gỗ kích thước lớn, phù hợp cho các xưởng sản xuất quy mô lớn.",
-    image: homeImages.productWood2,
-    features: ["Kích thước làm việc: 2100 x 3100 x 200mm", "Công suất spindle: 9kW", "Tốc độ spindle: 24,000 rpm"],
-  },
-  {
-    id: "5",
-    name: "CNC MetalPro 1000",
-    slug: "cnc-metalpro-1000",
-    category: "Máy CNC Kim Loại",
-    categorySlug: "metal",
-    description: "Máy CNC kim loại công suất siêu lớn, gia công các chi tiết kim loại phức tạp.",
-    image: homeImages.productMetal2,
-    features: ["Kích thước làm việc: 2000 x 4000 x 300mm", "Công suất spindle: 11kW", "Tốc độ spindle: 15,000 rpm"],
+    images: [{ url: homeImages.productLaser1, is_primary: true }],
+    features: [
+      { id: "1", title: "Kích thước làm việc", description: "1300 x 900mm" },
+      { id: "2", title: "Công suất laser", description: "150W" },
+      { id: "3", title: "Tốc độ cắt", description: "0-40000mm/min" },
+    ],
   },
 ]
 
-export default function FeaturedProducts() {
+interface FeaturedProductsProps {
+  products?: Product[]
+}
+
+export default function FeaturedProducts({ products = [] }: FeaturedProductsProps) {
+  // Use provided products or fallback to mock data if empty
+  const productList = products.length > 0 ? products : fallbackProducts
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const productsPerPage = 3
-  const totalPages = Math.ceil(featuredProducts.length / productsPerPage)
+  const totalPages = Math.ceil(productList.length / productsPerPage)
 
   // Navigate to previous page
   const prevPage = () => {
@@ -80,7 +77,7 @@ export default function FeaturedProducts() {
   // Calculate current visible products
   const visibleProducts = () => {
     const start = currentIndex * productsPerPage
-    return featuredProducts.slice(start, start + productsPerPage)
+    return productList.slice(start, start + productsPerPage)
   }
 
   return (
@@ -93,13 +90,13 @@ export default function FeaturedProducts() {
           >
             <div className="relative h-48 sm:h-56 md:h-64">
               <Image
-                src={product.image || "/placeholder.svg?height=224&width=400"}
+                src={product.images?.[0]?.url || "/placeholder.svg?height=224&width=400"}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-500 hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
-              <Badge className="absolute top-3 left-3 bg-white/90">{product.category}</Badge>
+              <Badge className="absolute top-3 left-3 bg-white/90">{product.category?.name || 'Sản phẩm'}</Badge>
             </div>
             <div className="p-4 sm:p-5">
               <h3 className="text-lg sm:text-xl font-bold mb-2 hover:text-primary transition-colors">
@@ -107,8 +104,8 @@ export default function FeaturedProducts() {
               </h3>
               <p className="text-zinc-600 mb-4 text-sm sm:text-base">{product.description}</p>
               <ul className="space-y-1 mb-4 text-xs sm:text-sm">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="text-zinc-600 flex items-start gap-2">
+                {product.features?.map((feature) => (
+                  <li key={feature.id} className="text-zinc-600 flex items-start gap-2">
                     <svg
                       className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0 mt-0.5"
                       fill="none"
@@ -118,7 +115,7 @@ export default function FeaturedProducts() {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>{feature}</span>
+                    <span><strong>{feature.title}:</strong> {feature.description}</span>
                   </li>
                 ))}
               </ul>

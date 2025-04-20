@@ -41,7 +41,7 @@ export async function PUT(
 
     // Cập nhật danh mục
     const { data: category, error } = await supabase
-      .from("product_categories")
+      .from("categories")
       .update(categoryData)
       .eq("id", id)
       .select()
@@ -71,23 +71,23 @@ export async function PUT(
 // Xóa danh mục
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: any } } 
+    { params }: { params: { id: any } }
   ) {
     try {
       const supabase = await createServerSupabaseClient();
-  
+
       const { id } = await params;
-  
-      const { error } = await supabase.from("product_categories").delete().eq("id", id);
-  
+
+      const { error } = await supabase.from("categories").delete().eq("id", id);
+
       if (error) {
         console.error('Error deleting category:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
-  
+
       // Revalidate the categories page to update the cache
       revalidatePath('/admin/products/categories');
-  
+
       return NextResponse.json({
         success: true,
         message: 'Category deleted successfully',
@@ -111,7 +111,7 @@ export async function GET(
     const { id } = await params;
 
     const { data: category, error } = await supabase
-      .from("product_categories")
+      .from("categories")
       .select("*")
       .eq("id", id)
       .single();

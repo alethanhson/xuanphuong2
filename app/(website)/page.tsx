@@ -15,12 +15,16 @@ import ClientLogos from "@/components/home/client-logos"
 import ContactSale from "@/components/home/contact-sale"
 import CTASection from "@/components/home/cta-section-v2"
 import { homeImages } from "@/lib/placeholder-images"
+import { getFeaturedProducts, getFeaturedBlogPosts } from "@/lib/data-service"
 
 export const metadata: Metadata = {
   title: "CNC Future - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
   description:
     "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại tại Việt Nam.",
   keywords: "máy cnc, cnc gỗ, cnc kim loại, máy cnc laser, thiết bị cnc, công nghệ cnc",
+  alternates: {
+    canonical: "https://cncfuture.com",
+  },
   openGraph: {
     title: "CNC Future - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
     description:
@@ -38,9 +42,18 @@ export const metadata: Metadata = {
     locale: "vi_VN",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "CNC Future - Giải Pháp CNC Toàn Diện",
+    description: "Chuyên cung cấp máy CNC chất lượng cao cho ngành gỗ và kim loại tại Việt Nam.",
+    images: [homeImages.hero],
+  },
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch data from Supabase
+  const featuredProducts = await getFeaturedProducts(5)
+  const featuredBlogPosts = await getFeaturedBlogPosts(3)
   return (
     <main>
       {/* Hero Section */}
@@ -145,7 +158,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <FeaturedProducts />
+          <FeaturedProducts products={featuredProducts} />
 
           <div className="text-center mt-8 sm:mt-10">
             <Button asChild size="lg" className="gap-2">
@@ -327,7 +340,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <BlogHighlights />
+          <BlogHighlights posts={featuredBlogPosts} />
 
           <div className="text-center mt-8 sm:mt-10">
             <Button asChild variant="outline" size="lg" className="gap-2">

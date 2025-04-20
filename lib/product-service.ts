@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '../supabase';
+import { createServerSupabaseClient } from './supabase';
 import type { Database } from '@/types/supabase';
 import type { ProductFilters } from '@/types/product';
 
@@ -302,30 +302,6 @@ export const ProductService = {
       };
     } catch (error) {
       console.error('Error in getProducts:', error);
-      return { error: { message: 'An unexpected error occurred' } };
-    }
-  },
-
-  /**
-   * Get product categories
-   */
-  async getCategories(): Promise<ApiResponse<any[]>> {
-    try {
-      const supabase = await createServerSupabaseClient();
-      
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-      
-      if (error) {
-        console.error('Error fetching categories:', error);
-        return { error: { message: 'Failed to fetch categories' } };
-      }
-      
-      return { data: data || [] };
-    } catch (error) {
-      console.error('Error in getCategories:', error);
       return { error: { message: 'An unexpected error occurred' } };
     }
   }

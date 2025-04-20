@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, use } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import React from 'react';
-import { ChevronLeft, Pencil, Trash, Eye, Star } from 'lucide-react';
+import { ChevronLeft, Pencil, Trash, Eye, Star, Share2, Check } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import {
   AlertDialog,
@@ -69,9 +69,20 @@ type Product = {
   power_consumption?: string | null;
   machine_dimensions?: string | null;
   weight?: string | null;
+  metadata?: {
+    furniture?: string;
+    interior_decoration?: string;
+    advertising?: string;
+    wood_industry_applications?: string[];
+    advertising_applications?: string[];
+    catalogue_url?: string;
+    manual_url?: string;
+    datasheet_url?: string;
+  };
 };
 
-interface Params {
+// Define the params interface
+interface PageParams {
   id: string;
 }
 
@@ -82,10 +93,11 @@ async function fetchProductData(id: string) {
     .select(
       `
       *,
-      categories:product_categories(id, name, slug),
+      categories:category_id(id, name, slug),
       images:product_images(*),
       features:product_features(*),
-      specifications:product_specifications(*)
+      specifications:product_specifications(*),
+      metadata
     `
     )
     .eq('id', id)
@@ -98,17 +110,40 @@ async function fetchProductData(id: string) {
   return productData;
 }
 
-export default function ProductDetailPage({ params }: { params: Params }) {
+export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { id } = React.use(params as any) as Params;
+  // Properly unwrap params with React.use() as recommended by Next.js
+  const { id } = use(params);
   console.log(id);
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Define the copyProductUrl function
+  const copyProductUrl = () => {
+    const url = `${window.location.origin}/products/${product?.slug || ''}`;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy URL:', err);
+        toast({
+          title: 'Lỗi',
+          description: 'Không thể sao chép đường dẫn',
+          variant: 'destructive',
+        });
+      });
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!id) return;
+
       try {
+        setIsLoading(true);
         const productData = await fetchProductData(id);
         setProduct(productData as unknown as Product);
       } catch (error) {
@@ -225,6 +260,17 @@ export default function ProductDetailPage({ params }: { params: Params }) {
                 <Eye className="mr-2 h-4 w-4" /> Xem
               </Link>
             </Button>
+            <Button variant="outline" size="sm" onClick={copyProductUrl}>
+              {copied ? (
+                <>
+                  <Check className="mr-2 h-4 w-4 text-green-500" /> Đã sao chép
+                </>
+              ) : (
+                <>
+                  <Share2 className="mr-2 h-4 w-4" /> Chia sẻ
+                </>
+              )}
+            </Button>
             <Button asChild variant="outline" size="sm">
               <Link href={`/admin/products/${id}/edit`}>
                 <Pencil className="mr-2 h-4 w-4" /> Sửa
@@ -269,6 +315,8 @@ export default function ProductDetailPage({ params }: { params: Params }) {
                   <TabsTrigger value="specifications">
                     Thông số kỹ thuật
                   </TabsTrigger>
+                  <TabsTrigger value="applications">Ứng dụng</TabsTrigger>
+                  <TabsTrigger value="documents">Tài liệu</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="details">
@@ -408,6 +456,129 @@ export default function ProductDetailPage({ params }: { params: Params }) {
                         <div>{product.weight}</div>
                       </div>
                     )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="applications">
+                  <div className="grid gap-6">
+                    {product.metadata?.furniture && (
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Ngành nội thất
+                        </h3>
+                        <p className="whitespace-pre-line">
+                          {product.metadata.furniture}
+                        </p>
+                      </div>
+                    )}
+
+                    {product.metadata?.interior_decoration && (
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Trang trí nội thất
+                        </h3>
+                        <p className="whitespace-pre-line">
+                          {product.metadata.interior_decoration}
+                        </p>
+                      </div>
+                    )}
+
+                    {product.metadata?.advertising && (
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Quảng cáo
+                        </h3>
+                        <p className="whitespace-pre-line">
+                          {product.metadata.advertising}
+                        </p>
+                      </div>
+                    )}
+
+                    {product.metadata?.wood_industry_applications && (
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Ứng dụng ngành công nghiệp gỗ
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {product.metadata.wood_industry_applications.map((app: string, index: number) => (
+                            <li key={index}>{app}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {product.metadata?.advertising_applications && (
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Ứng dụng ngành quảng cáo
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {product.metadata.advertising_applications.map((app: string, index: number) => (
+                            <li key={index}>{app}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="documents">
+                  <div className="grid gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Catalogue sản phẩm
+                        </h3>
+                        {product.metadata?.catalogue_url ? (
+                          <a
+                            href={product.metadata.catalogue_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Xem catalogue
+                          </a>
+                        ) : (
+                          <p>Không có</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Hướng dẫn sử dụng
+                        </h3>
+                        {product.metadata?.manual_url ? (
+                          <a
+                            href={product.metadata.manual_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Xem hướng dẫn sử dụng
+                          </a>
+                        ) : (
+                          <p>Không có</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <h3 className="mb-1 font-medium text-muted-foreground">
+                          Bảng thông số chi tiết
+                        </h3>
+                        {product.metadata?.datasheet_url ? (
+                          <a
+                            href={product.metadata.datasheet_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Xem bảng thông số
+                          </a>
+                        ) : (
+                          <p>Không có</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>

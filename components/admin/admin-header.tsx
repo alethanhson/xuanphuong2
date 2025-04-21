@@ -77,7 +77,6 @@ const mockNotifications: Notification[] = [
 // Path mapping for breadcrumbs
 const pathMap: Record<string, string> = {
   admin: "Dashboard",
-  analytics: "Phân tích & Thống kê",
   products: "Sản phẩm",
   add: "Thêm mới",
   edit: "Chỉnh sửa",
@@ -112,9 +111,13 @@ export default function AdminHeader() {
   }, [notifications])
 
   useEffect(() => {
-    const userData = Cookies.get("user")
-    if (userData) {
-      setUser(JSON.parse(userData))
+    try {
+      const userData = Cookies.get("user")
+      if (userData) {
+        setUser(JSON.parse(userData))
+      }
+    } catch (error) {
+      console.error("Error parsing user data from cookies:", error)
     }
   }, [])
 
@@ -131,7 +134,7 @@ export default function AdminHeader() {
   const logout = () => {
     // Xóa thông tin người dùng khỏi cookies
     Cookies.remove("user")
-    
+
     // Điều hướng người dùng đến trang đăng nhập
     router.push("/admin/login")
   }
@@ -199,7 +202,8 @@ export default function AdminHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full">
-              {theme === "light" ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+              <SunIcon className="h-5 w-5 dark:hidden" />
+              <MoonIcon className="h-5 w-5 hidden dark:block" />
               <span className="sr-only">Toggle theme</span>
             </Button>
           </DropdownMenuTrigger>
@@ -334,7 +338,7 @@ export default function AdminHeader() {
             <Button variant="outline" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                <AvatarFallback>{user?.name?.charAt(0) || "A"}</AvatarFallback>
+                <AvatarFallback>A</AvatarFallback>
               </Avatar>
               <span className="sr-only">Profile menu</span>
             </Button>

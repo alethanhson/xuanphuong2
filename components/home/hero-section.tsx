@@ -1,65 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, memo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { homeImages } from "@/lib/placeholder-images"
+import type { HeroSlide } from "@/lib/services/website-settings.service"
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  slides: HeroSlide[]
+}
+
+function HeroSection({ slides }: HeroSectionProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
-
-  const slides = [
-    {
-      title: "Giải Pháp CNC Toàn Diện",
-      subtitle: "Cho Ngành Gỗ & Kim Loại",
-      description: "Nâng cao hiệu suất sản xuất với máy móc CNC hiện đại, chất lượng cao và dịch vụ chuyên nghiệp.",
-      image: homeImages.hero,
-      cta: {
-        primary: {
-          text: "Khám phá sản phẩm",
-          link: "/products",
-        },
-        secondary: {
-          text: "Liên hệ tư vấn",
-          link: "/contact",
-        },
-      },
-    },
-    {
-      title: "Máy CNC Gỗ Chất Lượng Cao",
-      subtitle: "Độ Chính Xác Tuyệt Đối",
-      description: "Tối ưu hóa quy trình sản xuất đồ gỗ với các dòng máy CNC hiện đại, độ chính xác cao.",
-      image: homeImages.productWood1,
-      cta: {
-        primary: {
-          text: "Xem máy CNC gỗ",
-          link: "/products?category=wood",
-        },
-        secondary: {
-          text: "Yêu cầu báo giá",
-          link: "/contact",
-        },
-      },
-    },
-    {
-      title: "Máy CNC Kim Loại Hiện Đại",
-      subtitle: "Công Nghệ Tiên Tiến",
-      description: "Gia công kim loại chính xác với các dòng máy CNC công suất lớn, bền bỉ và đa năng.",
-      image: homeImages.productMetal1,
-      cta: {
-        primary: {
-          text: "Xem máy CNC kim loại",
-          link: "/products?category=metal",
-        },
-        secondary: {
-          text: "Đặt lịch tư vấn",
-          link: "/contact",
-        },
-      },
-    },
-  ]
 
   // Auto slide change
   useEffect(() => {
@@ -87,7 +40,14 @@ export default function HeroSection() {
           >
             {/* Background Image */}
             <div className="absolute inset-0">
-              <Image src={slide.image || "/placeholder.svg"} alt={slide.title} fill className="object-cover" priority />
+              <Image
+                src={slide.image || "/hero-section/placeholder.svg"}
+                alt={slide.title}
+                fill
+                className="object-cover"
+                priority
+                unoptimized={slide.image?.startsWith("http") || slide.image?.startsWith("/")}
+              />
               <div className="absolute inset-0 bg-black/50"></div>
             </div>
 
@@ -166,3 +126,4 @@ export default function HeroSection() {
   )
 }
 
+export default memo(HeroSection)

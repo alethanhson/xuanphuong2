@@ -6,6 +6,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import ScrollToTop from "@/components/scroll-to-top"
 import { Toaster } from "@/components/ui/toaster"
+import ClientLayout from "@/components/client-layout"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -34,13 +35,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html>
+    <html lang="vi">
       <body className={inter.className}>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <ScrollToTop />
-        <Toaster />
+        <ClientLayout>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <ScrollToTop />
+          <Toaster />
+        </ClientLayout>
       </body>
     </html>
   )

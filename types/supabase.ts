@@ -415,6 +415,30 @@ export interface Database {
           }
         ];
       };
+      website_settings: {
+        Row: {
+          id: string;
+          key: string;
+          value: Json;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          key: string;
+          value: Json;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          key?: string;
+          value?: Json;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

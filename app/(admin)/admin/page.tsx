@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -14,6 +14,10 @@ import {
   Calendar,
   TrendingUp,
   Eye,
+  Download,
+  LineChart,
+  PieChart,
+  Share2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -22,12 +26,39 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import { AreaChart, BarChart } from "@/components/admin/charts"
+import { AreaChart as AnalyticsAreaChart } from "@/components/admin/analytics/area-chart"
+import { DoughnutChart } from "@/components/admin/analytics/doughnut-chart"
+import { VisitorsTable } from "@/components/admin/analytics/visitors-table"
+import { ReferrersTable } from "@/components/admin/analytics/referrers-table"
+import { PageviewsTable } from "@/components/admin/analytics/pageviews-table"
 import { useFetch } from "@/hooks/use-api"
 import { dashboardService } from "@/lib/api"
 import type { DashboardStats, ChartData, CategoryChartData, Order, Customer } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function AdminDashboard() {
+  // Initialize with default value to avoid hydration mismatch
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Handle URL parameters after component mounts (client-side only)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, []);
+
+  // Update URL when tab changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (activeTab === "overview") {
+      url.searchParams.delete('tab');
+    } else {
+      url.searchParams.set('tab', activeTab);
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [activeTab]);
   const [dateRange, setDateRange] = useState("7days")
 
   // Fetch dashboard data
@@ -372,7 +403,7 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="analytics">Phân tích</TabsTrigger>
@@ -570,13 +601,81 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 gap-1">
+                <LineChart className="h-4 w-4" />
+                Line
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 gap-1">
+                <BarChart className="h-4 w-4" />
+                Bar
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 gap-1">
+                <PieChart className="h-4 w-4" />
+                Pie
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 gap-1">
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+            </div>
+            <Button variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Xuất dữ liệu
+            </Button>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Phân tích chi tiết</CardTitle>
-              <CardDescription>Thông tin chi tiết về hiệu suất kinh doanh</CardDescription>
+              <CardTitle>Lượt truy cập Admin</CardTitle>
+              <CardDescription>Số lượt truy cập các chức năng theo thời gian</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[400px]">
+              <AnalyticsAreaChart />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Trang được xem nhiều nhất</CardTitle>
+                <CardDescription>Top 10 trang được xem nhiều nhất</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PageviewsTable />
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Phân bố truy cập</CardTitle>
+                <CardDescription>Phân bố người dùng theo chức năng</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DoughnutChart />
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Người dùng truy cập</CardTitle>
+              <CardDescription>Phân tích chi tiết về người dùng truy cập website</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Đang phát triển tính năng phân tích chi tiết...</p>
+              <VisitorsTable />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Nguồn truy cập</CardTitle>
+              <CardDescription>Các nguồn truy cập vào website</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReferrersTable />
             </CardContent>
           </Card>
         </TabsContent>

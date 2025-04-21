@@ -3,7 +3,6 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { homeImages } from "@/lib/placeholder-images"
 
 // Mock data for services
 const services = [
@@ -13,7 +12,7 @@ const services = [
     slug: "tu-van-thiet-ke",
     description:
       "Đội ngũ chuyên gia giàu kinh nghiệm sẽ tư vấn và thiết kế giải pháp CNC phù hợp nhất với nhu cầu của bạn.",
-    image: homeImages.service1,
+    image: "/placeholder.svg",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -31,7 +30,7 @@ const services = [
     slug: "lap-dat-van-hanh",
     description:
       "Dịch vụ lắp đặt chuyên nghiệp, hướng dẫn vận hành chi tiết giúp bạn nhanh chóng đưa máy vào sản xuất.",
-    image: homeImages.service2,
+    image: "/placeholder.svg",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -49,7 +48,7 @@ const services = [
     name: "Bảo Trì & Sửa Chữa",
     slug: "bao-tri-sua-chua",
     description: "Dịch vụ bảo trì định kỳ và sửa chữa nhanh chóng, đảm bảo máy móc luôn hoạt động ổn định và hiệu quả.",
-    image: homeImages.service3,
+    image: "/placeholder.svg",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -67,7 +66,7 @@ const services = [
     slug: "dao-tao",
     description:
       "Chương trình đào tạo chuyên sâu về vận hành, bảo trì và sử dụng phần mềm CNC cho đội ngũ nhân viên của bạn.",
-    image: homeImages.service4,
+    image: "/placeholder.svg",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 14l9-5-9-5-9 5 9 5z" />

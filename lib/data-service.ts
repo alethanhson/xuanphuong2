@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from './supabase';
 import type { Database } from '@/types/supabase';
 
-// Types for our data
+
 export type Product = Database['public']['Tables']['products']['Row'] & {
   category?: { id: string; name: string; slug: string } | null;
   images?: { id: string; url: string; is_primary: boolean }[] | null;
@@ -11,7 +11,7 @@ export type Product = Database['public']['Tables']['products']['Row'] & {
 export type BlogPost = Partial<Database['public']['Tables']['blog_posts']['Row']> & {
   category?: { id: string; name: string; slug: string } | null;
   author?: { id?: string; name: string; avatar_url?: string | null } | null;
-  // Add fallback fields that might be used in the UI
+
   published_at?: string | null;
   created_at: string;
   featured_image?: string | null;
@@ -51,7 +51,7 @@ export async function getFeaturedBlogPosts(limit = 3): Promise<BlogPost[]> {
   const supabase = await createServerSupabaseClient();
 
   try {
-    // Fetch featured blog posts
+
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
@@ -67,14 +67,10 @@ export async function getFeaturedBlogPosts(limit = 3): Promise<BlogPost[]> {
       return [];
     }
 
-    // Process the data to match our expected format
+
     const processedData = data?.map(post => ({
       ...post,
-      // Add any missing fields with default values
-      author: { id: '1', name: 'Admin' },
-      // Ensure created_at exists
       created_at: post.created_at || new Date().toISOString(),
-      // Map published_at to created_at if it doesn't exist
       published_at: post.published_at || post.created_at || new Date().toISOString()
     })) as BlogPost[] || [];
 

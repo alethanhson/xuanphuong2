@@ -14,34 +14,40 @@ export function PageviewsTable() {
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell className="font-medium">/</TableCell>
-            <TableCell>Trang chủ | CNC Future</TableCell>
-            <TableCell>12,345</TableCell>
-            <TableCell className="text-right">2m 45s</TableCell>
+            <TableCell className="font-medium">/admin</TableCell>
+            <TableCell>Dashboard | Admin CNC Future</TableCell>
+            <TableCell>5,842</TableCell>
+            <TableCell className="text-right">4m 15s</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium">/products</TableCell>
-            <TableCell>Sản phẩm | CNC Future</TableCell>
-            <TableCell>8,752</TableCell>
-            <TableCell className="text-right">3m 12s</TableCell>
+            <TableCell className="font-medium">/admin?tab=analytics</TableCell>
+            <TableCell>Phân tích & Thống kê | Admin CNC Future</TableCell>
+            <TableCell>3,721</TableCell>
+            <TableCell className="text-right">5m 32s</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium">/products/cnc-woodmaster-500</TableCell>
-            <TableCell>CNC WoodMaster 500 | CNC Future</TableCell>
-            <TableCell>4,271</TableCell>
-            <TableCell className="text-right">4m 30s</TableCell>
+            <TableCell className="font-medium">/admin/products</TableCell>
+            <TableCell>Quản lý sản phẩm | Admin CNC Future</TableCell>
+            <TableCell>4,562</TableCell>
+            <TableCell className="text-right">6m 10s</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium">/contact</TableCell>
-            <TableCell>Liên hệ | CNC Future</TableCell>
-            <TableCell>3,842</TableCell>
-            <TableCell className="text-right">2m 10s</TableCell>
+            <TableCell className="font-medium">/admin/blog</TableCell>
+            <TableCell>Quản lý blog | Admin CNC Future</TableCell>
+            <TableCell>2,845</TableCell>
+            <TableCell className="text-right">3m 45s</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium">/blog</TableCell>
-            <TableCell>Blog & Tin tức | CNC Future</TableCell>
-            <TableCell>2,945</TableCell>
-            <TableCell className="text-right">3m 25s</TableCell>
+            <TableCell className="font-medium">/admin/contacts</TableCell>
+            <TableCell>Quản lý liên hệ | Admin CNC Future</TableCell>
+            <TableCell>1,932</TableCell>
+            <TableCell className="text-right">2m 20s</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="font-medium">/admin/website</TableCell>
+            <TableCell>Cài đặt trang web | Admin CNC Future</TableCell>
+            <TableCell>2,156</TableCell>
+            <TableCell className="text-right">4m 05s</TableCell>
           </TableRow>
         </TableBody>
       </Table>

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import type React from 'react';
-import AdminHeader from '@/components/admin/admin-header';
-import AdminSidebar from '@/components/admin/admin-sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
+import ClientLayout from '@/components/client-layout';
+import AdminClientWrapper from '@/components/admin/admin-client-wrapper';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,22 +17,16 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="min-h-screen bg-background">
-            <AdminSidebar />
-            <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-              <div className="flex flex-col lg:col-start-2">
-                <AdminHeader />
-                <main className="flex-1 overflow-y-auto p-4 md:p-6 pt-6">
-                  {children}
-                </main>
-              </div>
-            </div>
+    <html lang="vi" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <ClientLayout>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <AdminClientWrapper>
+              {children}
+            </AdminClientWrapper>
             <Toaster />
-          </div>
-        </ThemeProvider>
+          </ThemeProvider>
+        </ClientLayout>
       </body>
     </html>
   );

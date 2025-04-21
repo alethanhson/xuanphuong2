@@ -6,21 +6,12 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
-  BarChart,
-  CreditCard,
   Home,
   Package2,
-  ScrollText,
-  Settings,
-  ShoppingCart,
-  Store,
-  Users,
   Monitor,
-  FileText,
   Contact,
   HelpCircle,
   Menu,
-  Layers,
   Tag,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -42,11 +33,7 @@ const sidebarItems: SidebarItem[] = [
     href: "/admin",
     icon: Home,
   },
-  {
-    title: "Analytics",
-    href: "/admin/analytics",
-    icon: BarChart,
-  },
+
   {
     title: "Sản phẩm",
     href: "/admin/products",
@@ -69,48 +56,33 @@ const sidebarItems: SidebarItem[] = [
       },
     ],
   },
-  {
-    title: "Đơn hàng",
-    href: "/admin/orders",
-    icon: ShoppingCart,
-  },
-  {
-    title: "Khách hàng",
-    href: "/admin/customers",
-    icon: Users,
-  },
-  {
-    title: "Thanh toán",
-    href: "/admin/payments",
-    icon: CreditCard,
-  },
-  {
-    title: "Kho hàng",
-    href: "/admin/inventory",
-    icon: Store,
-  },
-  {
-    title: "Blog",
-    href: "/admin/blog",
-    icon: ScrollText,
-    submenu: [
-      {
-        title: "Tất cả bài viết",
-        href: "/admin/blog",
-        icon: ScrollText,
-      },
-      {
-        title: "Thêm bài viết",
-        href: "/admin/blog/add",
-        icon: ScrollText,
-      },
-      {
-        title: "Danh mục",
-        href: "/admin/blog/categories",
-        icon: Layers,
-      },
-    ],
-  },
+  // {
+  //   title: "Khách hàng",
+  //   href: "/admin/customers",
+  //   icon: Users,
+  // },
+  // {
+  //   title: "Blog",
+  //   href: "/admin/blog",
+  //   icon: ScrollText,
+  //   submenu: [
+  //     {
+  //       title: "Tất cả bài viết",
+  //       href: "/admin/blog",
+  //       icon: ScrollText,
+  //     },
+  //     {
+  //       title: "Thêm bài viết",
+  //       href: "/admin/blog/add",
+  //       icon: ScrollText,
+  //     },
+  //     {
+  //       title: "Danh mục",
+  //       href: "/admin/blog/categories",
+  //       icon: Layers,
+  //     },
+  //   ],
+  // },
   {
     title: "Liên hệ",
     href: "/admin/contacts",
@@ -120,11 +92,6 @@ const sidebarItems: SidebarItem[] = [
     title: "Trang web",
     href: "/admin/website",
     icon: Monitor,
-  },
-  {
-    title: "Báo cáo",
-    href: "/admin/reports",
-    icon: FileText,
   },
 ]
 
@@ -247,18 +214,7 @@ const MobileSidebar = ({ pathname }: { pathname: string }) => {
           </div>
           <div className="mt-auto p-4">
             <nav className="grid items-start gap-2 px-2 text-sm font-medium">
-              <Link
-                href="/admin/settings"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-                  pathname === "/admin/settings"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                <Settings className="h-4 w-4" />
-                Cài đặt
-              </Link>
+
               <Link
                 href="/admin/help"
                 className={cn(
@@ -303,18 +259,7 @@ export default function AdminSidebar() {
           </div>
           <div className="mt-auto p-4">
             <nav className="grid items-start gap-2 px-2 text-sm font-medium">
-              <Link
-                href="/admin/settings"
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-                  pathname === "/admin/settings"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                <Settings className="h-4 w-4" />
-                Cài đặt
-              </Link>
+
               <Link
                 href="/admin/help"
                 className={cn(

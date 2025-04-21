@@ -5,7 +5,6 @@ import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { homeImages } from "@/lib/placeholder-images"
 
 // Mock data for testimonials
 const testimonials = [
@@ -16,7 +15,7 @@ const testimonials = [
     company: "Xưởng Mộc Thành Công",
     quote:
       "Máy CNC WoodMaster 500 đã giúp chúng tôi tăng tốc độ cắt gỗ lên 2 lần và giảm đáng kể hao phí. Dịch vụ hỗ trợ kỹ thuật của CNC Future luôn sẵn sàng giải quyết mọi vấn đề một cách nhanh chóng.",
-    avatar: homeImages.avatar1,
+    avatar: "/placeholder.svg",
     rating: 5,
   },
   {
@@ -26,7 +25,7 @@ const testimonials = [
     company: "Cơ Khí Tân Tiến",
     quote:
       "Chúng tôi đã sử dụng máy CNC MetalPro 700 được hơn 2 năm và rất hài lòng với hiệu suất làm việc. Đội ngũ kỹ thuật của CNC Future rất chuyên nghiệp, từ tư vấn, lắp đặt đến bảo trì đều tận tâm.",
-    avatar: homeImages.avatar2,
+    avatar: "/placeholder.svg",
     rating: 5,
   },
   {
@@ -36,7 +35,7 @@ const testimonials = [
     company: "Nội Thất Hiện Đại",
     quote:
       "Đầu tư vào máy CNC của CNC Future là quyết định đúng đắn nhất của chúng tôi. Chất lượng sản phẩm tăng lên đáng kể, thời gian sản xuất giảm và khách hàng rất hài lòng với các sản phẩm tinh xảo.",
-    avatar: homeImages.avatar3,
+    avatar: "/placeholder.svg",
     rating: 4,
   },
   {
@@ -46,7 +45,7 @@ const testimonials = [
     company: "Quảng Cáo Sáng Tạo",
     quote:
       "Máy CNC Laser của CNC Future đã giúp chúng tôi mở rộng dịch vụ và tăng doanh thu đáng kể. Khả năng cắt và khắc chính xác trên nhiều vật liệu khác nhau là một lợi thế lớn cho công ty chúng tôi.",
-    avatar: homeImages.avatar4,
+    avatar: "/placeholder.svg",
     rating: 5,
   },
 ]

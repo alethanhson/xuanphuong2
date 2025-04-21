@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
-import { homeImages } from "@/lib/placeholder-images"
 import type { BlogPost } from "@/lib/data-service"
 
 // Fallback data in case no posts are provided
@@ -16,7 +15,7 @@ const fallbackPosts: BlogPost[] = [
     slug: "5-ly-do-chuyen-doi-sang-cnc-go-hien-dai",
     excerpt:
       "Khám phá những lợi ích mà máy CNC gỗ hiện đại mang lại cho doanh nghiệp của bạn, từ tăng năng suất đến nâng cao chất lượng sản phẩm.",
-    featured_image: homeImages.blog1,
+    featured_image: "/placeholder.svg",
     category: { id: "1", name: "Công Nghệ CNC", slug: "cong-nghe-cnc" },
     author: { id: "1", name: "Nguyễn Văn A" },
     published_at: "2023-05-15T00:00:00Z",
@@ -29,7 +28,7 @@ const fallbackPosts: BlogPost[] = [
     slug: "huong-dan-bao-tri-may-cnc-kim-loai-dung-cach",
     excerpt:
       "Bài viết chia sẻ các bước bảo trì máy CNC kim loại đúng cách để kéo dài tuổi thọ và đảm bảo hiệu suất làm việc tối ưu.",
-    featured_image: homeImages.blog2,
+    featured_image: "/placeholder.svg",
     category: { id: "2", name: "Bảo Trì", slug: "bao-tri" },
     author: { id: "2", name: "Trần Văn B" },
     published_at: "2023-06-22T00:00:00Z",
@@ -42,7 +41,7 @@ const fallbackPosts: BlogPost[] = [
     slug: "xu-huong-cong-nghe-cnc-2025-tu-dong-hoa-va-ai",
     excerpt:
       "Khám phá những xu hướng công nghệ CNC mới nhất sẽ định hình ngành công nghiệp trong năm 2025, với trọng tâm là tự động hóa và trí tuệ nhân tạo.",
-    featured_image: homeImages.blog3,
+    featured_image: "/placeholder.svg",
     category: { id: "3", name: "Xu Hướng", slug: "xu-huong" },
     author: { id: "3", name: "Lê Thị C" },
     published_at: "2023-07-10T00:00:00Z",

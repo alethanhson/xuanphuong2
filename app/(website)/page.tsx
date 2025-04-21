@@ -14,8 +14,9 @@ import BlogHighlights from "@/components/home/blog-highlights"
 import ClientLogos from "@/components/home/client-logos"
 import ContactSale from "@/components/home/contact-sale"
 import CTASection from "@/components/home/cta-section-v2"
-import { homeImages } from "@/lib/placeholder-images"
+
 import { getFeaturedProducts, getFeaturedBlogPosts } from "@/lib/data-service"
+import { WebsiteSettingsService } from "@/lib/services/website-settings.service"
 
 export const metadata: Metadata = {
   title: "CNC Future - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "CNC Future",
     images: [
       {
-        url: homeImages.hero,
+        url: "/hero-section/placeholder.svg",
         width: 1200,
         height: 630,
         alt: "CNC Future - Giải Pháp CNC Toàn Diện",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CNC Future - Giải Pháp CNC Toàn Diện",
     description: "Chuyên cung cấp máy CNC chất lượng cao cho ngành gỗ và kim loại tại Việt Nam.",
-    images: [homeImages.hero],
+    images: ["/hero-section/placeholder.svg"],
   },
 }
 
@@ -54,10 +55,72 @@ export default async function HomePage() {
   // Fetch data from Supabase
   const featuredProducts = await getFeaturedProducts(5)
   const featuredBlogPosts = await getFeaturedBlogPosts(3)
+
+  // Fetch hero section settings
+  const { data: heroSettings } = await WebsiteSettingsService.getHeroSectionSettings()
+
+  // Fallback slides if settings not found
+  const fallbackSlides = [
+    {
+      id: "slide1",
+      title: "Giải Pháp CNC Toàn Diện",
+      subtitle: "Cho Ngành Gỗ & Kim Loại",
+      description: "Nâng cao hiệu suất sản xuất với máy móc CNC hiện đại, chất lượng cao và dịch vụ chuyên nghiệp.",
+      image: "/hero-section/placeholder.svg",
+      cta: {
+        primary: {
+          text: "Khám phá sản phẩm",
+          link: "/products",
+        },
+        secondary: {
+          text: "Liên hệ tư vấn",
+          link: "/contact",
+        },
+      },
+    },
+    {
+      id: "slide2",
+      title: "Máy CNC Gỗ Chất Lượng Cao",
+      subtitle: "Độ Chính Xác Tuyệt Đối",
+      description: "Tối ưu hóa quy trình sản xuất đồ gỗ với các dòng máy CNC hiện đại, độ chính xác cao.",
+      image: "/hero-section/placeholder.svg",
+      cta: {
+        primary: {
+          text: "Xem máy CNC gỗ",
+          link: "/products?category=wood",
+        },
+        secondary: {
+          text: "Yêu cầu báo giá",
+          link: "/contact",
+        },
+      },
+    },
+    {
+      id: "slide3",
+      title: "Máy CNC Kim Loại Hiện Đại",
+      subtitle: "Công Nghệ Tiên Tiến",
+      description: "Gia công kim loại chính xác với các dòng máy CNC công suất lớn, bền bỉ và đa năng.",
+      image: "/hero-section/placeholder.svg",
+      cta: {
+        primary: {
+          text: "Xem máy CNC kim loại",
+          link: "/products?category=metal",
+        },
+        secondary: {
+          text: "Đặt lịch tư vấn",
+          link: "/contact",
+        },
+      },
+    },
+  ]
+
+  // Use settings if available, otherwise use fallback
+  const heroSlides = heroSettings?.slides || fallbackSlides
+
   return (
     <main>
       {/* Hero Section */}
-      <HeroSection />
+      <HeroSection slides={heroSlides} />
 
       {/* Trusted By Section */}
       <section className="py-8 bg-zinc-50">
@@ -74,7 +137,7 @@ export default async function HomePage() {
             <div className="relative rounded-lg overflow-hidden">
               <div className="aspect-w-4 aspect-h-3 relative">
                 <Image
-                  src={homeImages.about || "/placeholder.svg"}
+                  src={"/hero-section/placeholder.svg"}
                   alt="Về CNC Future"
                   fill
                   className="object-cover rounded-lg"

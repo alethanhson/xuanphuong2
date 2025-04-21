@@ -5,7 +5,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { Menu, X, ChevronDown, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { logoImage } from "@/lib/placeholder-images"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -40,7 +39,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              src={logoImage || "/placeholder.svg"}
+              src={"/placeholder.svg"}
               alt="CNC Future Logo"
               width={150}
               height={40}
@@ -162,7 +161,7 @@ export default function Header() {
             <div className="flex justify-between items-center p-4 border-b">
               <Link href="/" className="flex items-center" onClick={toggleMenu}>
                 <Image
-                  src={logoImage || "/placeholder.svg"}
+                  src={"/placeholder.svg"}
                   alt="CNC Future Logo"
                   width={120}
                   height={32}

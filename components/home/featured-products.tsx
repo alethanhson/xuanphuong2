@@ -6,7 +6,6 @@ import Image from "next/image"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { homeImages } from "@/lib/placeholder-images"
 import type { Product } from "@/lib/data-service"
 
 // Fallback data in case no products are provided
@@ -17,7 +16,7 @@ const fallbackProducts = [
     slug: "cnc-woodmaster-500",
     category: { name: "Máy CNC Gỗ", slug: "wood" },
     description: "Máy CNC gỗ hiện đại với độ chính xác cao, tốc độ xử lý nhanh.",
-    images: [{ url: homeImages.productWood1, is_primary: true }],
+    images: [{ url: "/placeholder.svg", is_primary: true }],
     features: [
       { id: "1", title: "Kích thước làm việc", description: "1300 x 2500 x 200mm" },
       { id: "2", title: "Công suất spindle", description: "5.5kW" },
@@ -30,7 +29,7 @@ const fallbackProducts = [
     slug: "cnc-metalpro-700",
     category: { name: "Máy CNC Kim Loại", slug: "metal" },
     description: "Máy CNC kim loại công suất lớn, gia công chính xác các chi tiết kim loại.",
-    images: [{ url: homeImages.productMetal1, is_primary: true }],
+    images: [{ url: "/placeholder.svg", is_primary: true }],
     features: [
       { id: "1", title: "Kích thước làm việc", description: "1500 x 3000 x 200mm" },
       { id: "2", title: "Công suất spindle", description: "7.5kW" },
@@ -43,7 +42,7 @@ const fallbackProducts = [
     slug: "cnc-lasertech-500",
     category: { name: "Máy CNC Laser", slug: "laser" },
     description: "Máy CNC laser hiện đại, cho phép cắt và khắc với độ chính xác cực cao.",
-    images: [{ url: homeImages.productLaser1, is_primary: true }],
+    images: [{ url: "/placeholder.svg", is_primary: true }],
     features: [
       { id: "1", title: "Kích thước làm việc", description: "1300 x 900mm" },
       { id: "2", title: "Công suất laser", description: "150W" },

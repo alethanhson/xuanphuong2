@@ -2,16 +2,15 @@
 
 import { useEffect, useRef } from "react"
 import Image from "next/image"
-import { customerImages } from "@/lib/placeholder-images"
 
-// Mock data for client logos
+// Client logos data
 const clientLogos = [
-  { id: "1", name: "Client 1", logo: customerImages.client1 },
-  { id: "2", name: "Client 2", logo: customerImages.client2 },
-  { id: "3", name: "Client 3", logo: customerImages.client3 },
-  { id: "4", name: "Client 4", logo: customerImages.client4 },
-  { id: "5", name: "Client 5", logo: customerImages.client5 },
-  { id: "6", name: "Client 6", logo: customerImages.client6 },
+  { id: "1", name: "Client 1", logo: "/placeholder.svg" },
+  { id: "2", name: "Client 2", logo: "/placeholder.svg" },
+  { id: "3", name: "Client 3", logo: "/placeholder.svg" },
+  { id: "4", name: "Client 4", logo: "/placeholder.svg" },
+  { id: "5", name: "Client 5", logo: "/placeholder.svg" },
+  { id: "6", name: "Client 6", logo: "/placeholder.svg" },
 ]
 
 export default function ClientLogos() {

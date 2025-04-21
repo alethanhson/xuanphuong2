@@ -80,9 +80,7 @@ export default function AddBlogPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      console.log(window.innerWidth);
-    }
+    // Remove console.log that was causing hydration issues
     setIsLoading(false);
   }, []);
 

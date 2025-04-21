@@ -12,10 +12,15 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export function CalendarDateRangePicker({ className }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2023, 0, 1),
-    to: new Date(),
-  })
+  const [date, setDate] = React.useState<DateRange | undefined>()
+
+  // Khởi tạo date range sau khi component được mount ở client
+  React.useEffect(() => {
+    setDate({
+      from: new Date(2023, 0, 1),
+      to: new Date(),
+    })
+  }, [])
 
   return (
     <div className={cn("grid gap-2", className)}>

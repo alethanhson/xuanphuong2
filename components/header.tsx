@@ -210,11 +210,11 @@ export default function Header() {
           {/* Contact Button */}
           <div className="hidden md:flex items-center">
             <a
-              href="tel:0355197235"
+              href="tel:0979756103"
               className="flex items-center text-primary font-medium hover:text-primary/80 transition-colors"
             >
               <Phone className="mr-2 h-4 w-4" />
-              <span>035.519.7235</span>
+              <span>0979.756.103</span>
             </a>
             <Button className="ml-4 shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90">Báo giá</Button>
           </div>
@@ -395,12 +395,12 @@ export default function Header() {
 
               <div className="mt-6 pt-6 border-t border-zinc-200">
                 <a
-                  href="tel:0355197235"
+                  href="tel:0979756103"
                   className="flex items-center py-3 px-4 text-base font-medium text-primary hover:bg-primary/5 rounded-md transition-colors"
                   onClick={toggleMenu}
                 >
                   <Phone className="mr-3 h-5 w-5" />
-                  <span>035.519.7235</span>
+                  <span>0979.756.103</span>
                 </a>
                 <div className="px-4 mt-3">
                   <Button className="w-full shadow-sm bg-primary hover:bg-primary/90" onClick={toggleMenu}>

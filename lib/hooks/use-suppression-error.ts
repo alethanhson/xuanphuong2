@@ -20,7 +20,10 @@ export function useSuppressionError() {
         "Warning: Expected server HTML to contain a matching",
         "Warning: An error occurred during hydration",
         "Warning: Prop `style` did not match",
-        "does not match server-rendered HTML"
+        "does not match server-rendered HTML",
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties",
+        "monica-id",
+        "monica-version"
       ]
 
       if (typeof args[0] === "string") {

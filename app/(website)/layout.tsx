@@ -37,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning={true}>
         <ClientLayout>
           <AnalyticsProvider>
             <Header />

@@ -19,29 +19,43 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   // Xóa các thuộc tính do extension thêm vào
   useEffect(() => {
+    // Chức năng xóa thuộc tính monica và các thuộc tính khác
+    function cleanupAttributes() {
+      // Xóa các thuộc tính monica-id và monica-version
+      const body = document.querySelector("body")
+      if (body) {
+        // Xóa rõ ràng các thuộc tính monica
+        if (body.hasAttribute("monica-id")) {
+          body.removeAttribute("monica-id")
+        }
+        if (body.hasAttribute("monica-version")) {
+          body.removeAttribute("monica-version")
+        }
+
+        // Xóa các thuộc tính khác có thể gây ra lỗi hydration
+        const attributesToRemove = Array.from(body.attributes)
+          .filter(attr => attr.name.startsWith('data-') || attr.name.includes('-'))
+          .map(attr => attr.name)
+
+        attributesToRemove.forEach(attr => {
+          if (attr !== 'data-theme' && attr !== 'class') {
+            body.removeAttribute(attr)
+          }
+        })
+      }
+    }
+
     // Đánh dấu component đã được mount
     setMounted(true)
-
-    // Xóa các thuộc tính monica-id và monica-version
-    const body = document.querySelector("body")
-    if (body) {
-      if (body.hasAttribute("monica-id")) {
-        body.removeAttribute("monica-id")
-      }
-      if (body.hasAttribute("monica-version")) {
-        body.removeAttribute("monica-version")
-      }
-
-      // Xóa các thuộc tính khác có thể gây ra lỗi hydration
-      const attributesToRemove = Array.from(body.attributes)
-        .filter(attr => attr.name.startsWith('data-') || attr.name.includes('-'))
-        .map(attr => attr.name)
-
-      attributesToRemove.forEach(attr => {
-        if (attr !== 'data-theme' && attr !== 'class') {
-          body.removeAttribute(attr)
-        }
-      })
+    
+    // Xóa thuộc tính ngay lập tức
+    cleanupAttributes()
+    
+    // Xóa thuộc tính sau một khoảng thời gian để đảm bảo các extension không thêm lại chúng
+    const interval = setInterval(cleanupAttributes, 1000)
+    
+    return () => {
+      clearInterval(interval)
     }
   }, [])
 

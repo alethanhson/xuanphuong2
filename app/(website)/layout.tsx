@@ -12,7 +12,7 @@ import AnalyticsProvider from "@/components/analytics-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://tantienvinh.com"),
   title: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
   description:
     "Tân Tiến Vinh chuyên cung cấp máy móc CNC gia công gỗ và kim loại, giải pháp sản xuất thông minh nâng cao hiệu suất. Tư vấn, thiết kế, lắp đặt và bảo trì chuyên nghiệp.",
@@ -23,10 +23,24 @@ export const metadata: Metadata = {
     title: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
     description:
       "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại tại Việt Nam.",
-    url: "https://cncfuture.com",
+    url: "https://tantienvinh.com",
     siteName: "Tân Tiến Vinh",
     locale: "vi_VN",
     type: "website",
+    images: [
+      {
+        url: "https://tantienvinh.com/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
+    description: "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại.",
+    images: ["https://tantienvinh.com/images/twitter-image.jpg"],
   },
 }
 

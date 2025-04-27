@@ -13,6 +13,7 @@ import {
   HelpCircle,
   Menu,
   Tag,
+  Mail,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -61,28 +62,35 @@ const sidebarItems: SidebarItem[] = [
   //   href: "/admin/customers",
   //   icon: Users,
   // },
-  // {
-  //   title: "Blog",
-  //   href: "/admin/blog",
-  //   icon: ScrollText,
-  //   submenu: [
-  //     {
-  //       title: "Tất cả bài viết",
-  //       href: "/admin/blog",
-  //       icon: ScrollText,
-  //     },
-  //     {
-  //       title: "Thêm bài viết",
-  //       href: "/admin/blog/add",
-  //       icon: ScrollText,
-  //     },
-  //     {
-  //       title: "Danh mục",
-  //       href: "/admin/blog/categories",
-  //       icon: Layers,
-  //     },
-  //   ],
-  // },
+  /* Blog section đã bị vô hiệu hóa
+  {
+    title: "Blog",
+    href: "/admin/blog",
+    icon: ScrollText,
+    submenu: [
+      {
+        title: "Tất cả bài viết",
+        href: "/admin/blog",
+        icon: ScrollText,
+      },
+      {
+        title: "Thêm bài viết",
+        href: "/admin/blog/add",
+        icon: ScrollText,
+      },
+      {
+        title: "Danh mục",
+        href: "/admin/blog/categories",
+        icon: Layers,
+      },
+    ],
+  },
+  */
+  {
+    title: "Quản lý tư vấn",
+    href: "/admin/consultation",
+    icon: Mail,
+  },
   {
     title: "Liên hệ",
     href: "/admin/contacts",

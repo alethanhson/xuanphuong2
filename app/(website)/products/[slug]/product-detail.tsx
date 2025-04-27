@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
 import type { Product } from "@/lib/product-service"
 import { Heart, Share2, Phone, Check } from "lucide-react"
+import ConsultationForm from "@/components/consultation-form"
 
 interface ProductDetailProps {
   product: Product
@@ -145,6 +146,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
                 </Button>
               </div>
+            </div>
+
+            {/* Add consultation form */}
+            <div className="mt-8">
+              <ConsultationForm 
+                productId={product.id} 
+                productName={product.name} 
+              />
             </div>
           </div>
         </div>

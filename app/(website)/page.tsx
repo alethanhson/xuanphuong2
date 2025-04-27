@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import HeroSection from "@/components/home/hero-section"
 import FeaturedProducts from "@/components/home/featured-products"
 import ServiceOverview from "@/components/home/service-overview"
-import BlogHighlights from "@/components/home/blog-highlights"
 import ContactSale from "@/components/home/contact-sale"
 import CTASection from "@/components/home/cta-section-v2"
 
@@ -53,7 +52,6 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   // Fetch data from Supabase
   const featuredProducts = await getFeaturedProducts(5)
-  const featuredBlogPosts = await getFeaturedBlogPosts(3)
 
   // Fetch hero section settings
   const { data: heroSettings } = await WebsiteSettingsService.getHeroSectionSettings()
@@ -311,30 +309,6 @@ export default async function HomePage() {
 
       {/* CTA Section */}
       <CTASection />
-
-      {/* Blog Section */}
-      <section className="py-12 sm:py-16 bg-zinc-50">
-        <div className="container mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <Badge className="mb-3 sm:mb-4">Blog & Tin Tức</Badge>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Bài Viết Mới Nhất</h2>
-            <p className="text-zinc-700 max-w-2xl mx-auto text-sm sm:text-base">
-              Cập nhật những thông tin mới nhất về công nghệ CNC, xu hướng ngành và các mẹo hữu ích.
-            </p>
-          </div>
-
-          <BlogHighlights posts={featuredBlogPosts} />
-
-          <div className="text-center mt-8 sm:mt-10">
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link href="/blog">
-                Xem tất cả bài viết
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
 
       {/* Contact Sale Section */}
       <section className="py-12 sm:py-16 md:py-24">

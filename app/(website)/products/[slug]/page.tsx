@@ -11,6 +11,7 @@ import { ChevronRight, Check, Download } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ConsultationForm from "@/components/consultation-form"
 
 // Generate metadata dynamically based on product
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -433,6 +434,21 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
       <Suspense fallback={<div className="h-96 bg-zinc-100 animate-pulse rounded-lg"></div>}>
         <RelatedProducts productId={product.id} />
       </Suspense>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+          {/* Existing product details content */}
+          {/* ... existing code ... */}
+        </div>
+        
+        {/* Add consultation form in the right sidebar */}
+        <div className="md:col-span-1">
+          <ConsultationForm 
+            productId={product.id} 
+            productName={product.name} 
+          />
+        </div>
+      </div>
     </>
   )
   } catch (error) {

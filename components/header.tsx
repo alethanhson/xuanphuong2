@@ -1,14 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Menu, X, ChevronDown, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
+  const pathname = usePathname()
+  const submenuRef = useRef<HTMLDivElement>(null)
+  const mobileSubmenuRef = useRef<HTMLDivElement>(null)
 
   // Theo dõi scroll để thay đổi style của header
   useEffect(() => {
@@ -24,14 +29,44 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Đóng submenu khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (submenuRef.current && !submenuRef.current.contains(event.target as Node)) {
+        setActiveSubmenu(null)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  // Đóng menu khi chuyển trang trên mobile
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [pathname])
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
+  }
+
+  const toggleSubmenu = (name: string) => {
+    setActiveSubmenu(activeSubmenu === name ? null : name)
+  }
+
+  // Kiểm tra đường dẫn hiện tại để thêm active style
+  const isActive = (path: string) => {
+    return pathname === path
+  }
+
+  const isProductActive = () => {
+    return pathname.startsWith('/products')
   }
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-white border-b"
+        isScrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white border-b"
       }`}
     >
       <div className="container mx-auto">
@@ -49,78 +84,124 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-0.5 lg:space-x-1">
             <Link
               href="/"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
+              className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                isActive('/') 
+                  ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                  : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+              }`}
             >
               Trang chủ
             </Link>
-            <div className="relative group">
+            <div className="relative group" ref={submenuRef}>
               <button
-                className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md flex items-center transition-colors"
+                className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md flex items-center transition-all duration-200 ${
+                  isProductActive() || activeSubmenu === 'products'
+                    ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                    : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+                }`}
                 aria-haspopup="true"
-                aria-expanded="false"
+                aria-expanded={activeSubmenu === 'products'}
+                onClick={() => toggleSubmenu('products')}
               >
                 Sản phẩm
-                <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
+                <ChevronDown className={`ml-1.5 h-4 w-4 transition-transform duration-300 ${
+                  activeSubmenu === 'products' ? 'rotate-180' : ''
+                }`} />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100 overflow-hidden">
-                <div className="py-2">
+              <div 
+                className={`absolute top-full -left-1/4 mt-1 w-64 bg-white rounded-lg shadow-xl border-0 overflow-hidden transition-all duration-300 z-50 ${
+                  activeSubmenu === 'products' 
+                    ? "opacity-100 translate-y-0 visible scale-100" 
+                    : "opacity-0 -translate-y-4 invisible scale-95 pointer-events-none"
+                }`}
+                style={{
+                  boxShadow: activeSubmenu === 'products' ? '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' : 'none'
+                }}
+              >
+                <div className="py-1">
                   <Link
                     href="/products"
-                    className="block px-4 py-2 text-sm text-zinc-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
+                      isActive('/products') && !pathname.includes('?category=')
+                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
+                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
+                    }`}
                   >
-                    Tất cả sản phẩm
+                    <span className="block ml-1">Tất cả sản phẩm</span>
                   </Link>
                   <Link
                     href="/products?category=wood"
-                    className="block px-4 py-2 text-sm text-zinc-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
+                      pathname.includes('?category=wood')
+                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
+                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
+                    }`}
                   >
-                    Máy CNC Gỗ
+                    <span className="block ml-1">Máy CNC Gỗ</span>
                   </Link>
                   <Link
                     href="/products?category=metal"
-                    className="block px-4 py-2 text-sm text-zinc-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
+                      pathname.includes('?category=metal')
+                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
+                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
+                    }`}
                   >
-                    Máy CNC Kim Loại
+                    <span className="block ml-1">Máy CNC Kim Loại</span>
                   </Link>
                   <Link
                     href="/products?category=laser"
-                    className="block px-4 py-2 text-sm text-zinc-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
+                      pathname.includes('?category=laser')
+                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
+                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
+                    }`}
                   >
-                    Máy CNC Laser
+                    <span className="block ml-1">Máy CNC Laser</span>
                   </Link>
                 </div>
               </div>
             </div>
             <Link
               href="/services"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
+              className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                isActive('/services') 
+                  ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                  : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+              }`}
             >
               Dịch vụ
             </Link>
-            <Link
-              href="/blog"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
+            {/* <Link
               href="/customers"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
+              className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                isActive('/customers') 
+                  ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                  : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+              }`}
             >
               Khách hàng
-            </Link>
+            </Link> */}
             <Link
               href="/about"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
+              className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                isActive('/about') 
+                  ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                  : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+              }`}
             >
               Giới thiệu
             </Link>
             <Link
               href="/contact"
-              className="px-2 lg:px-3 py-2 text-sm font-medium text-zinc-700 hover:text-primary rounded-md transition-colors"
+              className={`px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                isActive('/contact') 
+                  ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                  : "text-zinc-700 hover:text-primary hover:bg-primary/5"
+              }`}
             >
               Liên hệ
             </Link>
@@ -135,7 +216,7 @@ export default function Header() {
               <Phone className="mr-2 h-4 w-4" />
               <span>035.519.7235</span>
             </a>
-            <Button className="ml-4 shadow-sm hover:shadow-md transition-all">Báo giá</Button>
+            <Button className="ml-4 shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90">Báo giá</Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -153,9 +234,13 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" onClick={toggleMenu}>
+        <div 
+          className="md:hidden fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" 
+          onClick={toggleMenu}
+          style={{ animation: 'fadeIn 0.2s ease-out' }}
+        >
           <div
-            className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white shadow-xl overflow-y-auto"
+            className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white shadow-xl overflow-y-auto animate-slide-in-right"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center p-4 border-b">
@@ -178,53 +263,80 @@ export default function Header() {
             </div>
 
             <nav className="p-4">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Link
                   href="/"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                  className={`flex items-center py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                    isActive('/') 
+                      ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                      : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                  }`}
                   onClick={toggleMenu}
                 >
                   Trang chủ
                 </Link>
 
-                <div className="py-1">
+                <div className="py-1" ref={mobileSubmenuRef}>
                   <button
-                    className="flex items-center justify-between w-full py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
-                    onClick={() => {
-                      const submenu = document.getElementById("products-submenu")
-                      if (submenu) {
-                        submenu.classList.toggle("hidden")
-                      }
-                    }}
+                    className={`flex items-center justify-between w-full py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                      isProductActive() 
+                        ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                        : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                    }`}
+                    onClick={() => toggleSubmenu('mobile-products')}
                   >
                     <span>Sản phẩm</span>
-                    <ChevronDown className="h-5 w-5" />
+                    <ChevronDown className={`h-5 w-5 transition-transform duration-300 ${
+                      activeSubmenu === 'mobile-products' ? 'rotate-180' : ''
+                    }`} />
                   </button>
-                  <div id="products-submenu" className="hidden pl-4 mt-1 space-y-1">
+                  <div 
+                    className={`pl-4 mt-1 space-y-1.5 overflow-hidden transition-all duration-300 ${
+                      activeSubmenu === 'mobile-products' 
+                        ? 'max-h-64 opacity-100' 
+                        : 'max-h-0 opacity-0'
+                    }`}
+                  >
                     <Link
                       href="/products"
-                      className="block py-2 px-4 text-base text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
+                        isActive('/products') && !pathname.includes('?category=')
+                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
+                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
+                      }`}
                       onClick={toggleMenu}
                     >
                       Tất cả sản phẩm
                     </Link>
                     <Link
                       href="/products?category=wood"
-                      className="block py-2 px-4 text-base text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
+                        pathname.includes('?category=wood')
+                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
+                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
+                      }`}
                       onClick={toggleMenu}
                     >
                       Máy CNC Gỗ
                     </Link>
                     <Link
                       href="/products?category=metal"
-                      className="block py-2 px-4 text-base text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
+                        pathname.includes('?category=metal')
+                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
+                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
+                      }`}
                       onClick={toggleMenu}
                     >
                       Máy CNC Kim Loại
                     </Link>
                     <Link
                       href="/products?category=laser"
-                      className="block py-2 px-4 text-base text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
+                        pathname.includes('?category=laser')
+                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
+                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
+                      }`}
                       onClick={toggleMenu}
                     >
                       Máy CNC Laser
@@ -234,35 +346,47 @@ export default function Header() {
 
                 <Link
                   href="/services"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                  className={`flex items-center py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                    isActive('/services') 
+                      ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                      : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                  }`}
                   onClick={toggleMenu}
                 >
                   Dịch vụ
                 </Link>
-                <Link
-                  href="/blog"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Blog
-                </Link>
-                <Link
+
+                {/* <Link
                   href="/customers"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                  className={`flex items-center py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                    isActive('/customers') 
+                      ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                      : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                  }`}
                   onClick={toggleMenu}
                 >
                   Khách hàng
-                </Link>
+                </Link> */}
+
                 <Link
                   href="/about"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                  className={`flex items-center py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                    isActive('/about') 
+                      ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                      : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                  }`}
                   onClick={toggleMenu}
                 >
                   Giới thiệu
                 </Link>
+
                 <Link
                   href="/contact"
-                  className="block py-3 px-4 text-base font-medium text-zinc-700 hover:bg-zinc-50 hover:text-primary rounded-md transition-colors"
+                  className={`flex items-center py-3 px-4 text-base font-medium rounded-md transition-all duration-200 ${
+                    isActive('/contact') 
+                      ? "text-primary bg-primary/10 shadow-sm font-semibold" 
+                      : "text-zinc-700 hover:bg-zinc-50 hover:text-primary"
+                  }`}
                   onClick={toggleMenu}
                 >
                   Liên hệ
@@ -279,7 +403,7 @@ export default function Header() {
                   <span>035.519.7235</span>
                 </a>
                 <div className="px-4 mt-3">
-                  <Button className="w-full shadow-sm" onClick={toggleMenu}>
+                  <Button className="w-full shadow-sm bg-primary hover:bg-primary/90" onClick={toggleMenu}>
                     Báo giá
                   </Button>
                 </div>

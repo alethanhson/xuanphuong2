@@ -439,6 +439,52 @@ export interface Database {
         };
         Relationships: [];
       };
+      consultation_requests: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          phone: string | null;
+          company: string | null;
+          message: string | null;
+          product_id: string | null;
+          created_at: string;
+          status: string;
+          responded_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          email: string;
+          phone?: string | null;
+          company?: string | null;
+          message?: string | null;
+          product_id?: string | null;
+          created_at?: string;
+          status?: string;
+          responded_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          email?: string;
+          phone?: string | null;
+          company?: string | null;
+          message?: string | null;
+          product_id?: string | null;
+          created_at?: string;
+          status?: string;
+          responded_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'consultation_requests_product_id_fkey';
+            columns: ['product_id'];
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

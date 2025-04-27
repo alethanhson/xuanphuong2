@@ -10,13 +10,11 @@ WORKDIR /app
 # Sao chép package.json và package-lock.json
 COPY package.json package-lock.json* ./
 
-# Cài đặt Next.js global để có thể sử dụng lệnh next
-RUN npm install -g next
-
 # Cài đặt các dependencies với npm ci để đảm bảo đúng phiên bản
 RUN npm ci
-# Thêm global node_modules vào PATH
-ENV PATH /usr/local/lib/node_modules/.bin:$PATH
+# Kiểm tra xem next đã được cài đặt đúng chưa
+RUN ls -la node_modules/.bin/
+# Thêm .bin vào PATH để có thể tìm thấy next
 ENV PATH /app/node_modules/.bin:$PATH
 
 # Thiết lập biến môi trường
@@ -30,5 +28,5 @@ EXPOSE 3000
 ENV HOSTNAME 0.0.0.0
 ENV PORT 3000
 
-# Khởi động ứng dụng ở chế độ development
-CMD ["next", "dev"] 
+# Khởi động ứng dụng ở chế độ development sử dụng npx
+CMD ["npx", "next", "dev"] 

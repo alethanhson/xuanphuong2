@@ -31,7 +31,7 @@ import VietnamMap from "@/components/admin/analytics/vietnam-map"
 import GeographicStats from "@/components/admin/analytics/geographic-stats"
 import { useFetch } from "@/hooks/use-api"
 import { dashboardService } from "@/lib/api"
-import type { DashboardStats, ChartData, CategoryChartData, Order, Customer } from "@/types"
+import type { DashboardStats, ChartData, CategoryChartData, Order, Customer, PageViewData, VisitorStatData } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function AdminDashboard() {
@@ -97,30 +97,6 @@ export default function AdminDashboard() {
         { name: "14/07", total: 19500 },
         { name: "15/07", total: 20000 },
       ],
-      dependencies: [dateRange],
-    },
-  )
-
-  const { data: regionData, isLoading: regionLoading } = useFetch<CategoryChartData[]>(
-    dashboardService.getCategoryChart,
-    undefined,
-    {
-      initialData: [
-        { name: "Hồ Chí Minh", value: 42 },
-        { name: "Hà Nội", value: 26 },
-        { name: "Đà Nẵng", value: 9 },
-        { name: "Cần Thơ", value: 5 },
-        { name: "Hải Phòng", value: 4 },
-        { name: "Khác", value: 14 },
-      ],
-      dependencies: [dateRange],
-    },
-  )
-
-  const { data: visitorsByRegion, isLoading: visitorsByRegionLoading } = useFetch<VisitorData[]>(
-    dashboardService.getVisitorsByRegion,
-    undefined,
-    {
       dependencies: [dateRange],
     },
   )
@@ -441,7 +417,7 @@ export default function AdminDashboard() {
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="lg:col-span-4">
+            <Card className="lg:col-span-7">
               <CardHeader>
                 <CardTitle>Lượt truy cập theo ngày</CardTitle>
                 <CardDescription>Biểu đồ lượt truy cập trong 15 ngày gần đây</CardDescription>
@@ -458,22 +434,9 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-            <Card className="lg:col-span-3">
-              <CardHeader>
-                <CardTitle>Phân bố theo khu vực</CardTitle>
-                <CardDescription>Tỷ lệ phân bố người dùng theo khu vực</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {regionLoading ? (
-                  <Skeleton className="h-[350px] w-full" />
-                ) : (
-                  <BarChart data={regionData || []} height={350} valueFormatter={(value: number) => `${value}%`} />
-                )}
-              </CardContent>
-            </Card>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="lg:col-span-4">
+            <Card className="lg:col-span-7">
               <CardHeader>
                 <CardTitle>Trang được xem nhiều nhất</CardTitle>
                 <CardDescription>Top 10 trang được xem nhiều nhất</CardDescription>
@@ -519,55 +482,6 @@ export default function AdminDashboard() {
                   </TableBody>
                 </Table>
               </CardContent>
-            </Card>
-            <Card className="lg:col-span-3">
-              <CardHeader>
-                <CardTitle>Người dùng theo khu vực</CardTitle>
-                <CardDescription>Phân bố người dùng theo tỉnh thành</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {visitorsByRegionLoading
-                    ? Array(5)
-                        .fill(0)
-                        .map((_, index) => (
-                          <div key={index} className="flex items-center">
-                            <Skeleton className="h-9 w-9 rounded-full" />
-                            <div className="ml-4 space-y-1">
-                              <Skeleton className="h-4 w-24" />
-                              <Skeleton className="h-4 w-32" />
-                            </div>
-                            <Skeleton className="h-4 w-20 ml-auto" />
-                          </div>
-                        ))
-                    : visitorsByRegion?.map((region) => (
-                        <div key={region.region} className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
-                            <span className="text-sm font-medium">{region.region}</span>
-                            {region.city && <span className="text-sm text-muted-foreground ml-2">({region.city})</span>}
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-sm">{region.visitorCount.toLocaleString()} người dùng</div>
-                            <div className="text-sm font-medium">{region.percentage}%</div>
-                          </div>
-                        </div>
-                      ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="lg:col-span-4">
-              {!visitorsByRegionLoading && visitorsByRegion && (
-                <GeographicStats data={visitorsByRegion} />
-              )}
-            </Card>
-            <Card className="lg:col-span-3">
-              {!visitorsByRegionLoading && visitorsByRegion && (
-                <VietnamMap data={visitorsByRegion} />
-              )}
             </Card>
           </div>
         </TabsContent>
@@ -659,7 +573,7 @@ export default function AdminDashboard() {
           </Card>
 
           <div className="grid gap-4 md:grid-cols-7">
-            <Card className="col-span-4">
+            <Card className="col-span-7">
               <CardHeader>
                 <CardTitle>Trang được xem nhiều nhất</CardTitle>
                 <CardDescription>Top 10 trang được xem nhiều nhất</CardDescription>
@@ -668,22 +582,12 @@ export default function AdminDashboard() {
                 <PageviewsTable />
               </CardContent>
             </Card>
-
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Phân bố truy cập</CardTitle>
-                <CardDescription>Phân bố người dùng theo chức năng</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DoughnutChart />
-              </CardContent>
-            </Card>
           </div>
 
           <Card>
             <CardHeader>
               <CardTitle>Người dùng truy cập</CardTitle>
-              <CardDescription>Phân tích chi tiết về người dùng truy cập website</CardDescription>
+              <CardDescription>Phân tích chi tiết về thiết bị và trình duyệt</CardDescription>
             </CardHeader>
             <CardContent>
               <VisitorsTable />

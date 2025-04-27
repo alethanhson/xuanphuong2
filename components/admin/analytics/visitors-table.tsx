@@ -6,42 +6,42 @@ export function VisitorsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Quốc gia</TableHead>
-            <TableHead>Thành phố</TableHead>
+            <TableHead>Thiết bị</TableHead>
+            <TableHead>Trình duyệt</TableHead>
             <TableHead>Người dùng</TableHead>
             <TableHead className="text-right">Tỉ lệ</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell>Việt Nam</TableCell>
-            <TableCell>Hồ Chí Minh</TableCell>
-            <TableCell>8,352</TableCell>
-            <TableCell className="text-right">42.5%</TableCell>
+            <TableCell>Desktop</TableCell>
+            <TableCell>Chrome</TableCell>
+            <TableCell>6,824</TableCell>
+            <TableCell className="text-right">42.3%</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Việt Nam</TableCell>
-            <TableCell>Hà Nội</TableCell>
-            <TableCell>5,212</TableCell>
-            <TableCell className="text-right">28.3%</TableCell>
+            <TableCell>Mobile</TableCell>
+            <TableCell>Chrome</TableCell>
+            <TableCell>5,291</TableCell>
+            <TableCell className="text-right">28.5%</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Việt Nam</TableCell>
-            <TableCell>Đà Nẵng</TableCell>
-            <TableCell>1,845</TableCell>
-            <TableCell className="text-right">9.2%</TableCell>
+            <TableCell>Mobile</TableCell>
+            <TableCell>Safari</TableCell>
+            <TableCell>3,105</TableCell>
+            <TableCell className="text-right">16.2%</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Việt Nam</TableCell>
-            <TableCell>Cần Thơ</TableCell>
-            <TableCell>982</TableCell>
-            <TableCell className="text-right">5.1%</TableCell>
+            <TableCell>Desktop</TableCell>
+            <TableCell>Firefox</TableCell>
+            <TableCell>1,328</TableCell>
+            <TableCell className="text-right">8.1%</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Việt Nam</TableCell>
-            <TableCell>Khác</TableCell>
-            <TableCell>2,450</TableCell>
-            <TableCell className="text-right">14.9%</TableCell>
+            <TableCell>Desktop</TableCell>
+            <TableCell>Safari</TableCell>
+            <TableCell>593</TableCell>
+            <TableCell className="text-right">4.9%</TableCell>
           </TableRow>
         </TableBody>
       </Table>

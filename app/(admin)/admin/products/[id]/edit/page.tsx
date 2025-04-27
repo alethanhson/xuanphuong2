@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -99,6 +99,11 @@ const productFormSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
+// Thêm biến để kiểm soát debug logging và tần suất validation
+const MODE_DEBUG = process.env.NODE_ENV === 'development';
+const VALIDATION_DEBOUNCE_MS = 500; // Tăng thời gian debounce
+const VALIDATION_THROTTLE_MS = 1000; // Thêm thời gian throttle
+
 export default function EditProductPage({
   params,
 }: {
@@ -119,6 +124,13 @@ export default function EditProductPage({
   const [stepValidationState, setStepValidationState] = useState<boolean[]>(
     Array(6).fill(false)
   );
+  
+  // Thêm state và refs để tối ưu validation
+  const [isDirty, setIsDirty] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const lastValidateTimeRef = useRef<number>(0);
+  const validationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Define the form steps
   const formSteps = [
@@ -167,11 +179,28 @@ export default function EditProductPage({
 
   // Function to validate the current step
   const validateCurrentStep = async (): Promise<boolean> => {
-    // Avoid excessive logging
-    // console.log('Validating step:', currentStep);
-    let isValid = false;
+    const now = Date.now();
+    
+    // Kiểm tra throttle - nếu thời gian từ lần validate cuối quá ngắn, skip
+    if (now - lastValidateTimeRef.current < VALIDATION_THROTTLE_MS) {
+      if (MODE_DEBUG) console.log('Throttle: skipping validation');
+      return stepValidationState[currentStep]; // Giữ nguyên kết quả hiện tại
+    }
+
+    // Cập nhật thời gian validate cuối
+    lastValidateTimeRef.current = now;
+
+    // Tránh nhiều validate chạy đồng thời
+    if (isValidating) {
+      if (MODE_DEBUG) console.log('Already validating, skipping');
+      return stepValidationState[currentStep];
+    }
 
     try {
+      if (MODE_DEBUG) console.log('Validating step:', currentStep);
+      setIsValidating(true);
+      let isValid = false;
+
       switch (currentStep) {
         case 0: // Basic information
           // Trigger validation for required fields in the first step
@@ -182,8 +211,7 @@ export default function EditProductPage({
           isValid = !errors.name && !errors.slug && !errors.description &&
                    !errors.category_id && !errors.status;
 
-          // Avoid excessive logging
-          // console.log('Basic info validation errors:', errors);
+          MODE_DEBUG && errors && console.log('Basic info validation errors:', Object.keys(errors));
           break;
         case 1: // Images
           // Images are optional, but if there are any, there must be a primary one
@@ -208,40 +236,93 @@ export default function EditProductPage({
         default:
           isValid = false;
       }
+
+      // Chỉ cập nhật state nếu kết quả thực sự thay đổi
+      if (stepValidationState[currentStep] !== isValid) {
+        const newStepValidationState = [...stepValidationState];
+        newStepValidationState[currentStep] = isValid;
+        setStepValidationState(newStepValidationState);
+        
+        if (MODE_DEBUG) console.log('Step validation result:', isValid);
+      }
+      
+      return isValid;
     } catch (error) {
-      console.error('Validation error:', error);
-      isValid = false;
+      console.error('Validation error:', error instanceof Error ? error.message : 'Unknown error');
+      return false;
+    } finally {
+      setIsValidating(false);
     }
-
-    // Update the validation state of the current step
-    // Only update if the validation state has changed to prevent unnecessary re-renders
-    if (stepValidationState[currentStep] !== isValid) {
-      const newStepValidationState = [...stepValidationState];
-      newStepValidationState[currentStep] = isValid;
-      setStepValidationState(newStepValidationState);
-    }
-
-    // Avoid excessive logging
-    // console.log('Step validation result:', isValid);
-    return isValid;
   };
 
-  // Validate the current step when form values change - with debounce to prevent infinite loops
+  // Debouncedfunction to validate with delay
+  const debouncedValidateStep = useCallback(() => {
+    // Đặt trạng thái form là đã thay đổi
+    setIsDirty(true);
+    
+    // Xóa timer hiện tại nếu có
+    if (validationTimerRef.current) {
+      clearTimeout(validationTimerRef.current);
+      validationTimerRef.current = null;
+    }
+    
+    // Tạo timer mới
+    validationTimerRef.current = setTimeout(() => {
+      // Chỉ validate khi form đã thay đổi
+      if (isDirty) {
+        validateCurrentStep();
+        setIsDirty(false);
+      }
+    }, VALIDATION_DEBOUNCE_MS);
+  }, [currentStep, isDirty]);
+
+  // Validate the current step when form values change
   useEffect(() => {
-    // Use a debounced validation to prevent infinite loops
-    const timeoutId = setTimeout(() => {
-      validateCurrentStep();
+    // Tạo một bản sao đơn giản của hàm watch để giảm số lần gọi
+    const handleFormChange = () => {
+      // Sử dụng throttle để giới hạn tần suất xử lý
+      if (throttleTimerRef.current) return;
+      
+      throttleTimerRef.current = setTimeout(() => {
+        debouncedValidateStep();
+        throttleTimerRef.current = null;
+      }, 100);
+    };
+    
+    const subscription = form.watch(handleFormChange);
+
+    // Validate lần đầu và khi thay đổi step
+    const initialValidation = setTimeout(() => {
+      if (!isLoading) {
+        validateCurrentStep();
+      }
+    }, 500);
+
+    return () => {
+      subscription.unsubscribe();
+      // Xóa timer khi cleanup
+      if (validationTimerRef.current) {
+        clearTimeout(validationTimerRef.current);
+      }
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+      }
+      clearTimeout(initialValidation);
+    };
+  }, [currentStep, debouncedValidateStep, form, isLoading]);
+
+  // Bổ sung effect riêng để theo dõi images và features
+  useEffect(() => {
+    if (isLoading) return;
+    
+    const validateForImagesAndFeatures = setTimeout(() => {
+      if (currentStep === 1 || currentStep === 2) {
+        validateCurrentStep();
+      }
     }, 300);
-
-    return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, form.formState.isDirty]);
-
-  // Validate when images or features change
-  useEffect(() => {
-    validateCurrentStep();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images, features]);
+    
+    return () => clearTimeout(validateForImagesAndFeatures);
+  }, [images, features, currentStep, isLoading]);
 
   // Initial validation when the form is loaded with product data
   useEffect(() => {
@@ -262,10 +343,23 @@ export default function EditProductPage({
 
   // Function to advance to the next step
   const goToNextStep = async () => {
+    // Xóa timer hiện tại nếu có
+    if (validationTimerRef.current) {
+      clearTimeout(validationTimerRef.current);
+      validationTimerRef.current = null;
+    }
+    
+    if (throttleTimerRef.current) {
+      clearTimeout(throttleTimerRef.current);
+      throttleTimerRef.current = null;
+    }
+    
+    // Validate ngay lập tức mà không debounce
     const isValid = await validateCurrentStep();
 
     if (isValid && currentStep < formSteps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setIsDirty(true); // Đánh dấu là cần validate step mới
 
       // Focus the first field of the new step
       setTimeout(() => {
@@ -391,7 +485,7 @@ export default function EditProductPage({
         });
       } catch (err) {
         console.error('Error loading product:', err);
-        setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.');
+        setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại.');
       } finally {
         setIsLoading(false);
       }

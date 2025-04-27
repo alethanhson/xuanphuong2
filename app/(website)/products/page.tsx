@@ -51,10 +51,11 @@ export default async function ProductsPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Extract search parameters
-  const categorySlug = typeof searchParams.category === "string" ? searchParams.category : undefined
-  const search = typeof searchParams.search === "string" ? searchParams.search : undefined
-  const page = typeof searchParams.page === "string" ? Number.parseInt(searchParams.page) : 1
-  const sortBy = typeof searchParams.sortBy === "string" ? searchParams.sortBy : "newest"
+  const awaitedSearchParams = await searchParams
+  const categorySlug = typeof awaitedSearchParams.category === "string" ? awaitedSearchParams.category : undefined
+  const search = typeof awaitedSearchParams.search === "string" ? awaitedSearchParams.search : undefined
+  const page = typeof awaitedSearchParams.page === "string" ? Number.parseInt(awaitedSearchParams.page) : 1
+  const sortBy = typeof awaitedSearchParams.sortBy === "string" ? awaitedSearchParams.sortBy : "newest"
 
   // Fetch categories
   const categories = await getCategories()

@@ -6,14 +6,52 @@ import Image from "next/image"
 import { Menu, X, ChevronDown, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
+import { ProductService } from "@/lib/services/product.service"
+
+// Định nghĩa kiểu dữ liệu cho Category
+type Category = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image: string | null
+  created_at: string
+  updated_at: string | null
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const pathname = usePathname()
   const submenuRef = useRef<HTMLDivElement>(null)
   const mobileSubmenuRef = useRef<HTMLDivElement>(null)
+
+  // Lấy danh sách danh mục sản phẩm
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoadingCategories(true)
+        const { data, error } = await ProductService.getCategories()
+        if (error) {
+          console.error("Lỗi khi lấy danh mục:", error)
+          return
+        }
+        
+        if (data) {
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error)
+      } finally {
+        setIsLoadingCategories(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   // Theo dõi scroll để thay đổi style của header
   useEffect(() => {
@@ -132,36 +170,27 @@ export default function Header() {
                   >
                     <span className="block ml-1">Tất cả sản phẩm</span>
                   </Link>
-                  <Link
-                    href="/products?category=wood"
-                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
-                      pathname.includes('?category=wood')
-                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
-                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
-                    }`}
-                  >
-                    <span className="block ml-1">Máy CNC Gỗ</span>
-                  </Link>
-                  <Link
-                    href="/products?category=metal"
-                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
-                      pathname.includes('?category=metal')
-                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
-                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
-                    }`}
-                  >
-                    <span className="block ml-1">Máy CNC Kim Loại</span>
-                  </Link>
-                  <Link
-                    href="/products?category=laser"
-                    className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
-                      pathname.includes('?category=laser')
-                        ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
-                        : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
-                    }`}
-                  >
-                    <span className="block ml-1">Máy CNC Laser</span>
-                  </Link>
+                  
+                  {/* Danh sách danh mục sản phẩm động */}
+                  {isLoadingCategories ? (
+                    <div className="flex items-center px-4 py-3 text-sm text-zinc-500">
+                      <span className="block ml-1">Đang tải...</span>
+                    </div>
+                  ) : (
+                    categories.map((category) => (
+                      <Link
+                        key={category.id}
+                        href={`/products?category=${category.slug}`}
+                        className={`flex items-center px-4 py-3 text-sm transition-all duration-200 ${
+                          pathname.includes(`?category=${category.slug}`)
+                            ? "text-primary bg-primary/10 font-semibold border-l-[3px] border-primary" 
+                            : "text-zinc-700 hover:bg-primary/5 hover:text-primary hover:pl-5"
+                        }`}
+                      >
+                        <span className="block ml-1">{category.name}</span>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -293,7 +322,7 @@ export default function Header() {
                   <div 
                     className={`pl-4 mt-1 space-y-1.5 overflow-hidden transition-all duration-300 ${
                       activeSubmenu === 'mobile-products' 
-                        ? 'max-h-64 opacity-100' 
+                        ? 'max-h-[500px] opacity-100' 
                         : 'max-h-0 opacity-0'
                     }`}
                   >
@@ -308,39 +337,28 @@ export default function Header() {
                     >
                       Tất cả sản phẩm
                     </Link>
-                    <Link
-                      href="/products?category=wood"
-                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
-                        pathname.includes('?category=wood')
-                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
-                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
-                      }`}
-                      onClick={toggleMenu}
-                    >
-                      Máy CNC Gỗ
-                    </Link>
-                    <Link
-                      href="/products?category=metal"
-                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
-                        pathname.includes('?category=metal')
-                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
-                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
-                      }`}
-                      onClick={toggleMenu}
-                    >
-                      Máy CNC Kim Loại
-                    </Link>
-                    <Link
-                      href="/products?category=laser"
-                      className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
-                        pathname.includes('?category=laser')
-                          ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
-                          : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
-                      }`}
-                      onClick={toggleMenu}
-                    >
-                      Máy CNC Laser
-                    </Link>
+                    
+                    {/* Danh sách danh mục sản phẩm động cho mobile */}
+                    {isLoadingCategories ? (
+                      <div className="flex items-center py-3 px-4 text-base text-zinc-500">
+                        Đang tải...
+                      </div>
+                    ) : (
+                      categories.map((category) => (
+                        <Link
+                          key={category.id}
+                          href={`/products?category=${category.slug}`}
+                          className={`flex items-center py-3 px-4 text-base rounded-md transition-all duration-200 ${
+                            pathname.includes(`?category=${category.slug}`)
+                              ? "text-primary bg-primary/10 border-l-[3px] border-primary font-semibold" 
+                              : "text-zinc-700 hover:bg-zinc-50 hover:text-primary hover:pl-5"
+                          }`}
+                          onClick={toggleMenu}
+                        >
+                          {category.name}
+                        </Link>
+                      ))
+                    )}
                   </div>
                 </div>
 

@@ -21,8 +21,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
+import { cn } from '@/lib/utils';
+
+// Khởi tạo Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// Tạo function để lấy Supabase client
+function getSupabaseClient() {
+  return createClient<Database>(supabaseUrl, supabaseAnonKey);
+}
 
 type Product = {
   id: number;
@@ -87,7 +97,7 @@ interface PageParams {
 }
 
 async function fetchProductData(id: string) {
-  const supabase = createClientComponentClient<Database>();
+  const supabase = getSupabaseClient();
   const { data: productData, error: productError } = await supabase
     .from('products')
     .select(
@@ -166,8 +176,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
     setIsDeleting(true);
     try {
+      const supabase = getSupabaseClient();
+      
       const { error: featuresError } =
-        await createClientComponentClient<Database>()
+        await supabase
           .from('product_features')
           .delete()
           .eq('product_id', product.id);
@@ -175,7 +187,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       if (featuresError) throw featuresError;
 
       const { error: specificationsError } =
-        await createClientComponentClient<Database>()
+        await supabase
           .from('product_specifications')
           .delete()
           .eq('product_id', product.id);
@@ -183,7 +195,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       if (specificationsError) throw specificationsError;
 
       const { error: imagesError } =
-        await createClientComponentClient<Database>()
+        await supabase
           .from('product_images')
           .delete()
           .eq('product_id', product.id);
@@ -191,7 +203,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       if (imagesError) throw imagesError;
 
       const { error: productError } =
-        await createClientComponentClient<Database>()
+        await supabase
           .from('products')
           .delete()
           .eq('id', String(product.id));
@@ -244,9 +256,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 {product.name}
               </h1>
               {product.is_featured && (
-                <Badge className="bg-yellow-500 text-primary-foreground">
+                <div className="bg-yellow-500 text-primary-foreground rounded-full px-2 py-1 text-xs font-medium inline-flex items-center">
                   <Star className="mr-1 h-3 w-3 fill-current" /> Nổi bật
-                </Badge>
+                </div>
               )}
             </div>
             <p className="text-muted-foreground">
@@ -346,9 +358,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                             className="aspect-video w-full object-cover"
                           />
                           {image.isPrimary && (
-                            <Badge className="absolute top-2 right-2 bg-yellow-500">
+                            <div className="absolute top-2 right-2 bg-yellow-500 rounded-full px-2 py-1 text-xs font-medium">
                               Chính
-                            </Badge>
+                            </div>
                           )}
                         </div>
                       ))}
@@ -594,21 +606,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-muted-foreground">Trạng thái</div>
                   <div>
-                    <Badge
-                      className={
+                    <div
+                      className={`rounded-full px-2 py-1 text-xs font-medium text-white ${
                         product.status === 'active'
                           ? 'bg-green-500'
                           : product.status === 'draft'
                           ? 'bg-yellow-500'
                           : 'bg-red-500'
-                      }
+                      }`}
                     >
                       {product.status === 'active'
                         ? 'Đang bán'
                         : product.status === 'draft'
                         ? 'Nháp'
                         : 'Ngừng bán'}
-                    </Badge>
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">

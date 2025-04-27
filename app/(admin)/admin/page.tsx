@@ -6,18 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ArrowDown,
   ArrowUp,
-  CreditCard,
-  DollarSign,
-  Package,
-  ShoppingCart,
-  Users,
   Calendar,
-  TrendingUp,
-  Eye,
+  Clock,
   Download,
-  LineChart,
-  PieChart,
-  Share2,
+  Eye,
+  Layers,
+  LogOut,
+  UserCheck,
+  Users
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -31,6 +27,8 @@ import { DoughnutChart } from "@/components/admin/analytics/doughnut-chart"
 import { VisitorsTable } from "@/components/admin/analytics/visitors-table"
 import { ReferrersTable } from "@/components/admin/analytics/referrers-table"
 import { PageviewsTable } from "@/components/admin/analytics/pageviews-table"
+import VietnamMap from "@/components/admin/analytics/vietnam-map"
+import GeographicStats from "@/components/admin/analytics/geographic-stats"
 import { useFetch } from "@/hooks/use-api"
 import { dashboardService } from "@/lib/api"
 import type { DashboardStats, ChartData, CategoryChartData, Order, Customer } from "@/types"
@@ -64,50 +62,81 @@ export default function AdminDashboard() {
   // Fetch dashboard data
   const { data: stats, isLoading: statsLoading } = useFetch<DashboardStats>(dashboardService.getStats, undefined, {
     initialData: {
-      revenue: 152500000,
-      revenueChange: 12.5,
-      orders: 45,
-      ordersChange: 8.2,
-      customers: 28,
-      customersChange: 15.3,
-      products: 32,
-      productsChange: -5.2,
+      totalVisitors: 20000,
+      totalVisitorsChange: 12.5,
+      uniqueVisitors: 14000,
+      uniqueVisitorsChange: 8.2,
+      pageViews: 60000,
+      pageViewsChange: 15.3,
+      avgSessionDuration: 250,
+      avgSessionDurationChange: 6.8,
+      bounceRate: 25.0,
+      bounceRateChange: -5.2,
     },
     dependencies: [dateRange],
   })
 
-  const { data: revenueData, isLoading: revenueLoading } = useFetch<ChartData[]>(
+  const { data: visitorData, isLoading: visitorLoading } = useFetch<ChartData[]>(
     dashboardService.getRevenueChart,
     undefined,
     {
       initialData: [
-        { name: "Tháng 1", total: 18000000 },
-        { name: "Tháng 2", total: 22000000 },
-        { name: "Tháng 3", total: 25000000 },
-        { name: "Tháng 4", total: 19000000 },
-        { name: "Tháng 5", total: 28000000 },
-        { name: "Tháng 6", total: 32000000 },
-        { name: "Tháng 7", total: 35000000 },
-        { name: "Tháng 8", total: 40000000 },
-        { name: "Tháng 9", total: 38000000 },
-        { name: "Tháng 10", total: 42000000 },
-        { name: "Tháng 11", total: 45000000 },
-        { name: "Tháng 12", total: 50000000 },
+        { name: "01/07", total: 12500 },
+        { name: "02/07", total: 13200 },
+        { name: "03/07", total: 12800 },
+        { name: "04/07", total: 13500 },
+        { name: "05/07", total: 14200 },
+        { name: "06/07", total: 14800 },
+        { name: "07/07", total: 15100 },
+        { name: "08/07", total: 15600 },
+        { name: "09/07", total: 16200 },
+        { name: "10/07", total: 16800 },
+        { name: "11/07", total: 17500 },
+        { name: "12/07", total: 18200 },
+        { name: "13/07", total: 18900 },
+        { name: "14/07", total: 19500 },
+        { name: "15/07", total: 20000 },
       ],
       dependencies: [dateRange],
     },
   )
 
-  const { data: categoryData, isLoading: categoryLoading } = useFetch<CategoryChartData[]>(
+  const { data: regionData, isLoading: regionLoading } = useFetch<CategoryChartData[]>(
     dashboardService.getCategoryChart,
     undefined,
     {
       initialData: [
-        { name: "Máy CNC Gỗ", value: 45 },
-        { name: "Máy CNC Kim Loại", value: 25 },
-        { name: "Máy CNC Laser", value: 20 },
-        { name: "Phụ kiện CNC", value: 10 },
+        { name: "Hồ Chí Minh", value: 42 },
+        { name: "Hà Nội", value: 26 },
+        { name: "Đà Nẵng", value: 9 },
+        { name: "Cần Thơ", value: 5 },
+        { name: "Hải Phòng", value: 4 },
+        { name: "Khác", value: 14 },
       ],
+      dependencies: [dateRange],
+    },
+  )
+
+  const { data: visitorsByRegion, isLoading: visitorsByRegionLoading } = useFetch<VisitorData[]>(
+    dashboardService.getVisitorsByRegion,
+    undefined,
+    {
+      dependencies: [dateRange],
+    },
+  )
+
+  const { data: pageViews, isLoading: pageViewsLoading } = useFetch<PageViewData[]>(
+    dashboardService.getPageViews,
+    undefined,
+    {
+      dependencies: [dateRange],
+    },
+  )
+
+  const { data: visitorStats, isLoading: visitorStatsLoading } = useFetch<VisitorStatData[]>(
+    dashboardService.getVisitorStats,
+    undefined,
+    {
       dependencies: [dateRange],
     },
   )
@@ -266,7 +295,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Tổng quan về hoạt động kinh doanh của bạn</p>
+          <p className="text-muted-foreground">Thống kê lượt truy cập và sử dụng website</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={dateRange} onValueChange={setDateRange}>
@@ -291,27 +320,27 @@ export default function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Doanh thu</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Tổng lượt truy cập</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {statsLoading ? (
               <Skeleton className="h-8 w-36" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{formatCurrency(stats?.revenue || 0)}</div>
+                <div className="text-2xl font-bold">{stats?.totalVisitors?.toLocaleString()}</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span
-                    className={`flex items-center ${stats?.revenueChange && stats.revenueChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`flex items-center ${stats?.totalVisitorsChange && stats.totalVisitorsChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
                   >
-                    {stats?.revenueChange && stats.revenueChange > 0 ? (
+                    {stats?.totalVisitorsChange && stats.totalVisitorsChange > 0 ? (
                       <ArrowUp className="h-4 w-4 mr-1" />
                     ) : (
                       <ArrowDown className="h-4 w-4 mr-1" />
                     )}
-                    {Math.abs(stats?.revenueChange || 0)}%
+                    {Math.abs(stats?.totalVisitorsChange || 0)}%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </>
             )}
@@ -319,27 +348,27 @@ export default function AdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Đơn hàng</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Người dùng duy nhất</CardTitle>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {statsLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.orders}</div>
+                <div className="text-2xl font-bold">{stats?.uniqueVisitors?.toLocaleString()}</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span
-                    className={`flex items-center ${stats?.ordersChange && stats.ordersChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`flex items-center ${stats?.uniqueVisitorsChange && stats.uniqueVisitorsChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
                   >
-                    {stats?.ordersChange && stats.ordersChange > 0 ? (
+                    {stats?.uniqueVisitorsChange && stats.uniqueVisitorsChange > 0 ? (
                       <ArrowUp className="h-4 w-4 mr-1" />
                     ) : (
                       <ArrowDown className="h-4 w-4 mr-1" />
                     )}
-                    {Math.abs(stats?.ordersChange || 0)}%
+                    {Math.abs(stats?.uniqueVisitorsChange || 0)}%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </>
             )}
@@ -347,27 +376,27 @@ export default function AdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Khách hàng mới</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Lượt xem trang</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {statsLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.customers}</div>
+                <div className="text-2xl font-bold">{stats?.pageViews?.toLocaleString()}</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span
-                    className={`flex items-center ${stats?.customersChange && stats.customersChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`flex items-center ${stats?.pageViewsChange && stats.pageViewsChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
                   >
-                    {stats?.customersChange && stats.customersChange > 0 ? (
+                    {stats?.pageViewsChange && stats.pageViewsChange > 0 ? (
                       <ArrowUp className="h-4 w-4 mr-1" />
                     ) : (
                       <ArrowDown className="h-4 w-4 mr-1" />
                     )}
-                    {Math.abs(stats?.customersChange || 0)}%
+                    {Math.abs(stats?.pageViewsChange || 0)}%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </>
             )}
@@ -375,27 +404,27 @@ export default function AdminDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sản phẩm đã bán</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Tỉ lệ thoát</CardTitle>
+            <LogOut className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {statsLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.products}</div>
+                <div className="text-2xl font-bold">{stats?.bounceRate?.toFixed(1)}%</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span
-                    className={`flex items-center ${stats?.productsChange && stats.productsChange > 0 ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`flex items-center ${stats?.bounceRateChange && stats.bounceRateChange < 0 ? "text-emerald-500" : "text-rose-500"}`}
                   >
-                    {stats?.productsChange && stats.productsChange > 0 ? (
-                      <ArrowUp className="h-4 w-4 mr-1" />
-                    ) : (
+                    {stats?.bounceRateChange && stats.bounceRateChange < 0 ? (
                       <ArrowDown className="h-4 w-4 mr-1" />
+                    ) : (
+                      <ArrowUp className="h-4 w-4 mr-1" />
                     )}
-                    {Math.abs(stats?.productsChange || 0)}%
+                    {Math.abs(stats?.bounceRateChange || 0)}%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </>
             )}
@@ -414,31 +443,31 @@ export default function AdminDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="lg:col-span-4">
               <CardHeader>
-                <CardTitle>Doanh thu theo tháng</CardTitle>
-                <CardDescription>Biểu đồ doanh thu theo tháng trong năm</CardDescription>
+                <CardTitle>Lượt truy cập theo ngày</CardTitle>
+                <CardDescription>Biểu đồ lượt truy cập trong 15 ngày gần đây</CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                {revenueLoading ? (
+                {visitorLoading ? (
                   <Skeleton className="h-[350px] w-full" />
                 ) : (
                   <AreaChart
-                    data={revenueData || []}
+                    data={visitorData || []}
                     height={350}
-                    valueFormatter={(value: number) => formatCurrency(value)}
+                    valueFormatter={(value: number) => `${value.toLocaleString()} lượt truy cập`}
                   />
                 )}
               </CardContent>
             </Card>
             <Card className="lg:col-span-3">
               <CardHeader>
-                <CardTitle>Phân bố sản phẩm theo danh mục</CardTitle>
-                <CardDescription>Tỷ lệ phân bố sản phẩm theo từng danh mục</CardDescription>
+                <CardTitle>Phân bố theo khu vực</CardTitle>
+                <CardDescription>Tỷ lệ phân bố người dùng theo khu vực</CardDescription>
               </CardHeader>
               <CardContent>
-                {categoryLoading ? (
+                {regionLoading ? (
                   <Skeleton className="h-[350px] w-full" />
                 ) : (
-                  <BarChart data={categoryData || []} height={350} valueFormatter={(value: number) => `${value}%`} />
+                  <BarChart data={regionData || []} height={350} valueFormatter={(value: number) => `${value}%`} />
                 )}
               </CardContent>
             </Card>
@@ -446,22 +475,21 @@ export default function AdminDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="lg:col-span-4">
               <CardHeader>
-                <CardTitle>Đơn hàng gần đây</CardTitle>
-                <CardDescription>Danh sách các đơn hàng mới nhất</CardDescription>
+                <CardTitle>Trang được xem nhiều nhất</CardTitle>
+                <CardDescription>Top 10 trang được xem nhiều nhất</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Mã đơn</TableHead>
-                      <TableHead>Khách hàng</TableHead>
-                      <TableHead className="hidden md:table-cell">Ngày đặt</TableHead>
-                      <TableHead className="text-right">Số tiền</TableHead>
-                      <TableHead className="text-right">Trạng thái</TableHead>
+                      <TableHead>Đường dẫn</TableHead>
+                      <TableHead>Tiêu đề trang</TableHead>
+                      <TableHead>Lượt xem</TableHead>
+                      <TableHead className="text-right">Thời gian TB</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {ordersLoading
+                    {pageViewsLoading
                       ? Array(5)
                           .fill(0)
                           .map((_, index) => (
@@ -472,40 +500,20 @@ export default function AdminDashboard() {
                               <TableCell>
                                 <Skeleton className="h-5 w-24" />
                               </TableCell>
-                              <TableCell className="hidden md:table-cell">
-                                <Skeleton className="h-5 w-24" />
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <Skeleton className="h-5 w-20 ml-auto" />
+                              <TableCell>
+                                <Skeleton className="h-5 w-16" />
                               </TableCell>
                               <TableCell className="text-right">
                                 <Skeleton className="h-5 w-20 ml-auto" />
                               </TableCell>
                             </TableRow>
                           ))
-                      : recentOrders?.map((order) => (
-                          <TableRow key={order.id}>
-                            <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                            <TableCell>{order.customer?.name}</TableCell>
-                            <TableCell className="hidden md:table-cell">{formatDate(order.createdAt)}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(order.totalAmount)}</TableCell>
-                            <TableCell className="text-right">
-                              <Badge
-                                variant={
-                                  order.status === "completed"
-                                    ? "default"
-                                    : order.status === "processing"
-                                      ? "secondary"
-                                      : "outline"
-                                }
-                              >
-                                {order.status === "completed"
-                                  ? "Hoàn thành"
-                                  : order.status === "processing"
-                                    ? "Đang xử lý"
-                                    : "Chờ xác nhận"}
-                              </Badge>
-                            </TableCell>
+                      : pageViews?.map((page) => (
+                          <TableRow key={page.pageUrl}>
+                            <TableCell className="font-medium">{page.pageUrl}</TableCell>
+                            <TableCell>{page.pageTitle}</TableCell>
+                            <TableCell>{page.viewCount.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{Math.floor(page.avgTimeOnPage / 60)}m {page.avgTimeOnPage % 60}s</TableCell>
                           </TableRow>
                         ))}
                   </TableBody>
@@ -514,12 +522,12 @@ export default function AdminDashboard() {
             </Card>
             <Card className="lg:col-span-3">
               <CardHeader>
-                <CardTitle>Khách hàng hàng đầu</CardTitle>
-                <CardDescription>Khách hàng có giá trị đơn hàng cao nhất</CardDescription>
+                <CardTitle>Người dùng theo khu vực</CardTitle>
+                <CardDescription>Phân bố người dùng theo tỉnh thành</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-8">
-                  {customersLoading
+                <div className="space-y-4">
+                  {visitorsByRegionLoading
                     ? Array(5)
                         .fill(0)
                         .map((_, index) => (
@@ -532,21 +540,34 @@ export default function AdminDashboard() {
                             <Skeleton className="h-4 w-20 ml-auto" />
                           </div>
                         ))
-                    : topCustomers?.map((customer) => (
-                        <div key={customer.id} className="flex items-center">
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={customer.avatar} alt="Avatar" />
-                            <AvatarFallback>{customer.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div className="ml-4 space-y-1">
-                            <p className="text-sm font-medium leading-none">{customer.name}</p>
-                            <p className="text-sm text-muted-foreground">{customer.email}</p>
+                    : visitorsByRegion?.map((region) => (
+                        <div key={region.region} className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
+                            <span className="text-sm font-medium">{region.region}</span>
+                            {region.city && <span className="text-sm text-muted-foreground ml-2">({region.city})</span>}
                           </div>
-                          <div className="ml-auto font-medium">{formatCurrency(customer.totalSpent)}</div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-sm">{region.visitorCount.toLocaleString()} người dùng</div>
+                            <div className="text-sm font-medium">{region.percentage}%</div>
+                          </div>
                         </div>
                       ))}
                 </div>
               </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="lg:col-span-4">
+              {!visitorsByRegionLoading && visitorsByRegion && (
+                <GeographicStats data={visitorsByRegion} />
+              )}
+            </Card>
+            <Card className="lg:col-span-3">
+              {!visitorsByRegionLoading && visitorsByRegion && (
+                <VietnamMap data={visitorsByRegion} />
+              )}
             </Card>
           </div>
         </TabsContent>
@@ -554,49 +575,49 @@ export default function AdminDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Tỷ lệ chuyển đổi</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Thời gian trung bình</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">3.6%</div>
+                <div className="text-2xl font-bold">4m 10s</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span className="flex items-center text-emerald-500">
                     <ArrowUp className="h-4 w-4 mr-1" />
-                    0.5%
+                    12.5%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Lượt xem trang</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Tỷ lệ thoát</CardTitle>
+                <LogOut className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12,543</div>
+                <div className="text-2xl font-bold">25.0%</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span className="flex items-center text-emerald-500">
-                    <ArrowUp className="h-4 w-4 mr-1" />
-                    12.2%
+                    <ArrowDown className="h-4 w-4 mr-1" />
+                    5.2%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Giá trị đơn hàng trung bình</CardTitle>
-                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Trang/phiên</CardTitle>
+                <Layers className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">3,250,000 ₫</div>
+                <div className="text-2xl font-bold">3.2</div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <span className="flex items-center text-emerald-500">
                     <ArrowUp className="h-4 w-4 mr-1" />
                     8.3%
                   </span>
-                  <span>so với tháng trước</span>
+                  <span>so với tuần trước</span>
                 </div>
               </CardContent>
             </Card>
@@ -605,20 +626,20 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="hidden md:flex items-center gap-2">
               <Button variant="outline" size="sm" className="h-8 gap-1">
-                <LineChart className="h-4 w-4" />
-                Line
+                <Calendar className="h-4 w-4" />
+                7 ngày
               </Button>
               <Button variant="outline" size="sm" className="h-8 gap-1">
-                <BarChart className="h-4 w-4" />
-                Bar
+                <Calendar className="h-4 w-4" />
+                30 ngày
               </Button>
               <Button variant="outline" size="sm" className="h-8 gap-1">
-                <PieChart className="h-4 w-4" />
-                Pie
+                <Calendar className="h-4 w-4" />
+                90 ngày
               </Button>
               <Button variant="outline" size="sm" className="h-8 gap-1">
-                <Share2 className="h-4 w-4" />
-                Share
+                <Calendar className="h-4 w-4" />
+                Năm nay
               </Button>
             </div>
             <Button variant="outline">
@@ -629,8 +650,8 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Lượt truy cập Admin</CardTitle>
-              <CardDescription>Số lượt truy cập các chức năng theo thời gian</CardDescription>
+              <CardTitle>Lượt truy cập theo thời gian</CardTitle>
+              <CardDescription>Biểu đồ lượt truy cập theo ngày</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
               <AnalyticsAreaChart />

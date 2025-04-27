@@ -111,7 +111,7 @@ export const ProductService = {
       console.log('Query result:', { hasData: !!data, error: error || 'No error' });
 
       if (error || !data) {
-        console.error('Error fetching product by slug:', error || 'No data returned');
+        console.error('Error fetching product by slug:', error?.message || error || 'No data returned');
 
         // Log the error for debugging purposes
         console.log('Error details:', error);
@@ -274,11 +274,11 @@ export const ProductService = {
       }
 
       // Process the data
-      const products = data ? data.map(product => {
+      const products = data ? data.map((product: Product | null) => {
         if (!product) return null;
 
         // Process images
-        const images = product.images?.map(img => ({
+        const images = product.images?.map((img: { id: string; url: string; alt_text?: string | null; is_primary: boolean }) => ({
           ...img,
           alt: product.name, // Use product name as alt text since alt_text column doesn't exist
           isPrimary: img.is_primary

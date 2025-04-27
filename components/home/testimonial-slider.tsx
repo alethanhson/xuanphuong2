@@ -14,7 +14,7 @@ const testimonials = [
     role: "Giám đốc",
     company: "Xưởng Mộc Thành Công",
     quote:
-      "Máy CNC WoodMaster 500 đã giúp chúng tôi tăng tốc độ cắt gỗ lên 2 lần và giảm đáng kể hao phí. Dịch vụ hỗ trợ kỹ thuật của CNC Future luôn sẵn sàng giải quyết mọi vấn đề một cách nhanh chóng.",
+      "Máy CNC WoodMaster 500 đã giúp chúng tôi tăng tốc độ cắt gỗ lên 2 lần và giảm đáng kể hao phí. Dịch vụ hỗ trợ kỹ thuật của Tân Tiến Vinh luôn sẵn sàng giải quyết mọi vấn đề một cách nhanh chóng.",
     avatar: "/placeholder.svg",
     rating: 5,
   },
@@ -24,7 +24,7 @@ const testimonials = [
     role: "Quản lý sản xuất",
     company: "Cơ Khí Tân Tiến",
     quote:
-      "Chúng tôi đã sử dụng máy CNC MetalPro 700 được hơn 2 năm và rất hài lòng với hiệu suất làm việc. Đội ngũ kỹ thuật của CNC Future rất chuyên nghiệp, từ tư vấn, lắp đặt đến bảo trì đều tận tâm.",
+      "Chúng tôi đã sử dụng máy CNC MetalPro 700 được hơn 2 năm và rất hài lòng với hiệu suất làm việc. Đội ngũ kỹ thuật của Tân Tiến Vinh rất chuyên nghiệp, từ tư vấn, lắp đặt đến bảo trì đều tận tâm.",
     avatar: "/placeholder.svg",
     rating: 5,
   },
@@ -34,7 +34,7 @@ const testimonials = [
     role: "Chủ xưởng",
     company: "Nội Thất Hiện Đại",
     quote:
-      "Đầu tư vào máy CNC của CNC Future là quyết định đúng đắn nhất của chúng tôi. Chất lượng sản phẩm tăng lên đáng kể, thời gian sản xuất giảm và khách hàng rất hài lòng với các sản phẩm tinh xảo.",
+      "Đầu tư vào máy CNC của Tân Tiến Vinh là quyết định đúng đắn nhất của chúng tôi. Chất lượng sản phẩm tăng lên đáng kể, thời gian sản xuất giảm và khách hàng rất hài lòng với các sản phẩm tinh xảo.",
     avatar: "/placeholder.svg",
     rating: 4,
   },
@@ -44,7 +44,7 @@ const testimonials = [
     role: "Giám đốc điều hành",
     company: "Quảng Cáo Sáng Tạo",
     quote:
-      "Máy CNC Laser của CNC Future đã giúp chúng tôi mở rộng dịch vụ và tăng doanh thu đáng kể. Khả năng cắt và khắc chính xác trên nhiều vật liệu khác nhau là một lợi thế lớn cho công ty chúng tôi.",
+      "Máy CNC Laser của Tân Tiến Vinh đã giúp chúng tôi mở rộng dịch vụ và tăng doanh thu đáng kể. Khả năng cắt và khắc chính xác trên nhiều vật liệu khác nhau là một lợi thế lớn cho công ty chúng tôi.",
     avatar: "/placeholder.svg",
     rating: 5,
   },

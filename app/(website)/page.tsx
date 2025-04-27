@@ -9,35 +9,34 @@ import { Badge } from "@/components/ui/badge"
 import HeroSection from "@/components/home/hero-section"
 import FeaturedProducts from "@/components/home/featured-products"
 import ServiceOverview from "@/components/home/service-overview"
-import TestimonialSlider from "@/components/home/testimonial-slider"
 import BlogHighlights from "@/components/home/blog-highlights"
-import ClientLogos from "@/components/home/client-logos"
 import ContactSale from "@/components/home/contact-sale"
 import CTASection from "@/components/home/cta-section-v2"
 
 import { getFeaturedProducts, getFeaturedBlogPosts } from "@/lib/data-service"
 import { WebsiteSettingsService } from "@/lib/services/website-settings.service"
+import { FALLBACK_HERO_SLIDES } from "@/lib/constants"
 
 export const metadata: Metadata = {
-  title: "CNC Future - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
+  title: "Tân Tiến Vinh - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
   description:
     "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại tại Việt Nam.",
   keywords: "máy cnc, cnc gỗ, cnc kim loại, máy cnc laser, thiết bị cnc, công nghệ cnc",
   alternates: {
-    canonical: "https://cncfuture.com",
+    canonical: "https://tantienvinh.com",
   },
   openGraph: {
-    title: "CNC Future - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
+    title: "Tân Tiến Vinh - Giải Pháp CNC Toàn Diện Cho Ngành Gỗ & Kim Loại",
     description:
       "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại tại Việt Nam.",
-    url: "https://cncfuture.com",
-    siteName: "CNC Future",
+    url: "https://tantienvinh.com",
+    siteName: "Tân Tiến Vinh",
     images: [
       {
         url: "/hero-section/placeholder.svg",
         width: 1200,
         height: 630,
-        alt: "CNC Future - Giải Pháp CNC Toàn Diện",
+        alt: "Tân Tiến Vinh - Giải Pháp CNC Toàn Diện",
       },
     ],
     locale: "vi_VN",
@@ -45,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CNC Future - Giải Pháp CNC Toàn Diện",
+    title: "Tân Tiến Vinh - Giải Pháp CNC Toàn Diện",
     description: "Chuyên cung cấp máy CNC chất lượng cao cho ngành gỗ và kim loại tại Việt Nam.",
     images: ["/hero-section/placeholder.svg"],
   },
@@ -59,76 +58,13 @@ export default async function HomePage() {
   // Fetch hero section settings
   const { data: heroSettings } = await WebsiteSettingsService.getHeroSectionSettings()
 
-  // Fallback slides if settings not found
-  const fallbackSlides = [
-    {
-      id: "slide1",
-      title: "Giải Pháp CNC Toàn Diện",
-      subtitle: "Cho Ngành Gỗ & Kim Loại",
-      description: "Nâng cao hiệu suất sản xuất với máy móc CNC hiện đại, chất lượng cao và dịch vụ chuyên nghiệp.",
-      image: "/hero-section/placeholder.svg",
-      cta: {
-        primary: {
-          text: "Khám phá sản phẩm",
-          link: "/products",
-        },
-        secondary: {
-          text: "Liên hệ tư vấn",
-          link: "/contact",
-        },
-      },
-    },
-    {
-      id: "slide2",
-      title: "Máy CNC Gỗ Chất Lượng Cao",
-      subtitle: "Độ Chính Xác Tuyệt Đối",
-      description: "Tối ưu hóa quy trình sản xuất đồ gỗ với các dòng máy CNC hiện đại, độ chính xác cao.",
-      image: "/hero-section/placeholder.svg",
-      cta: {
-        primary: {
-          text: "Xem máy CNC gỗ",
-          link: "/products?category=wood",
-        },
-        secondary: {
-          text: "Yêu cầu báo giá",
-          link: "/contact",
-        },
-      },
-    },
-    {
-      id: "slide3",
-      title: "Máy CNC Kim Loại Hiện Đại",
-      subtitle: "Công Nghệ Tiên Tiến",
-      description: "Gia công kim loại chính xác với các dòng máy CNC công suất lớn, bền bỉ và đa năng.",
-      image: "/hero-section/placeholder.svg",
-      cta: {
-        primary: {
-          text: "Xem máy CNC kim loại",
-          link: "/products?category=metal",
-        },
-        secondary: {
-          text: "Đặt lịch tư vấn",
-          link: "/contact",
-        },
-      },
-    },
-  ]
-
   // Use settings if available, otherwise use fallback
-  const heroSlides = heroSettings?.slides || fallbackSlides
+  const heroSlides = heroSettings?.slides || FALLBACK_HERO_SLIDES
 
   return (
     <main>
       {/* Hero Section */}
       <HeroSection slides={heroSlides} />
-
-      {/* Trusted By Section */}
-      <section className="py-8 bg-zinc-50">
-        <div className="container mx-auto px-4">
-          <p className="text-center text-zinc-600 mb-6">Được tin dùng bởi hơn 500+ doanh nghiệp tại Việt Nam</p>
-          <ClientLogos />
-        </div>
-      </section>
 
       {/* About Section */}
       <section className="py-12 sm:py-16 md:py-24">
@@ -138,7 +74,7 @@ export default async function HomePage() {
               <div className="aspect-w-4 aspect-h-3 relative">
                 <Image
                   src={"/hero-section/placeholder.svg"}
-                  alt="Về CNC Future"
+                  alt="Về Tân Tiến Vinh"
                   fill
                   className="object-cover rounded-lg"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -151,11 +87,11 @@ export default async function HomePage() {
             <div>
               <Badge className="mb-3 sm:mb-4">Về Chúng Tôi</Badge>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
-                Đối tác tin cậy trong lĩnh vực <span className="text-primary">công nghệ CNC</span>
+                Đối tác tin cậy trong lĩnh vực <span className="text-primary">thiết bị ngành gỗ</span>
               </h2>
               <p className="text-zinc-700 mb-4 sm:mb-6 text-sm sm:text-base">
-                CNC Future tự hào là đơn vị tiên phong trong việc cung cấp các giải pháp CNC toàn diện cho ngành công
-                nghiệp gỗ và kim loại tại Việt Nam. Với hơn 10 năm kinh nghiệm, chúng tôi cam kết mang đến những sản
+                Tân Tiến Vinh tự hào là đơn vị tiên phong trong việc cung cấp các giải pháp thiết bị toàn diện cho ngành
+                công nghiệp gỗ và nội thất tại Việt Nam. Với hơn 10 năm kinh nghiệm, chúng tôi cam kết mang đến những sản
                 phẩm chất lượng cao, dịch vụ chuyên nghiệp và giải pháp tối ưu cho doanh nghiệp của bạn.
               </p>
 
@@ -214,9 +150,9 @@ export default async function HomePage() {
         <div className="container mx-auto">
           <div className="text-center mb-8 sm:mb-12">
             <Badge className="mb-3 sm:mb-4">Sản Phẩm Nổi Bật</Badge>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Máy CNC Chất Lượng Cao</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Thiết Bị Gỗ Chất Lượng Cao</h2>
             <p className="text-zinc-700 max-w-2xl mx-auto text-sm sm:text-base">
-              Chúng tôi cung cấp các dòng máy CNC hiện đại, được thiết kế đặc biệt cho ngành gỗ và kim loại, giúp tối ưu
+              Chúng tôi cung cấp các dòng máy móc hiện đại, được thiết kế đặc biệt cho ngành gỗ và nội thất, giúp tối ưu
               hóa quy trình sản xuất của bạn.
             </p>
           </div>
@@ -242,7 +178,7 @@ export default async function HomePage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Giải Pháp Toàn Diện</h2>
             <p className="text-zinc-700 max-w-2xl mx-auto text-sm sm:text-base">
               Chúng tôi cung cấp các dịch vụ chuyên nghiệp từ tư vấn, thiết kế đến lắp đặt, bảo trì và đào tạo, đảm bảo
-              máy móc của bạn luôn hoạt động hiệu quả.
+              thiết bị của bạn luôn hoạt động hiệu quả.
             </p>
           </div>
 
@@ -267,11 +203,10 @@ export default async function HomePage() {
               Tại Sao Chọn Chúng Tôi
             </Badge>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-              Lý Do Khách Hàng Tin Tưởng CNC Future
+              Lý Do Nên Chọn Tân Tiến Vinh
             </h2>
             <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base">
-              Với hơn 10 năm kinh nghiệm, chúng tôi tự hào là đối tác tin cậy của hàng trăm doanh nghiệp trong lĩnh vực
-              công nghiệp gỗ và kim loại.
+              Với hơn 10 năm kinh nghiệm, chúng tôi tự hào mang đến những giải pháp CNC chất lượng cao và dịch vụ chuyên nghiệp.
             </p>
           </div>
 
@@ -371,21 +306,6 @@ export default async function HomePage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-12 sm:py-16 md:py-24">
-        <div className="container mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <Badge className="mb-3 sm:mb-4">Khách Hàng Nói Gì</Badge>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Đánh Giá Từ Khách Hàng</h2>
-            <p className="text-zinc-700 max-w-2xl mx-auto text-sm sm:text-base">
-              Hãy nghe những chia sẻ từ khách hàng đã và đang sử dụng sản phẩm và dịch vụ của CNC Future.
-            </p>
-          </div>
-
-          <TestimonialSlider />
         </div>
       </section>
 

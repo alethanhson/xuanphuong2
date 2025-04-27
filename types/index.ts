@@ -100,14 +100,16 @@ export interface Address {
 
 // Dashboard interfaces
 export interface DashboardStats {
-  revenue: number
-  revenueChange: number
-  orders: number
-  ordersChange: number
-  customers: number
-  customersChange: number
-  products: number
-  productsChange: number
+  totalVisitors: number
+  totalVisitorsChange: number
+  uniqueVisitors: number
+  uniqueVisitorsChange: number
+  pageViews: number
+  pageViewsChange: number
+  avgSessionDuration: number
+  avgSessionDurationChange: number
+  bounceRate: number
+  bounceRateChange: number
 }
 
 export interface ChartData {
@@ -118,6 +120,31 @@ export interface ChartData {
 export interface CategoryChartData {
   name: string
   value: number
+}
+
+export interface VisitorData {
+  region: string
+  city?: string
+  visitorCount: number
+  pageViews: number
+  percentage?: number
+}
+
+export interface PageViewData {
+  pageUrl: string
+  pageTitle: string
+  viewCount: number
+  uniqueVisitors: number
+  avgTimeOnPage: number
+}
+
+export interface VisitorStatData {
+  date: string
+  totalVisitors: number
+  uniqueVisitors: number
+  pageViews: number
+  avgSessionDuration: number
+  bounceRate: number
 }
 
 // Auth interfaces

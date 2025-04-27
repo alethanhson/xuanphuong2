@@ -56,47 +56,9 @@ export const ProductService = {
    */
   async getProductBySlug(slug: string): Promise<ApiResponse<Product>> {
     try {
-      console.log('Fetching product with slug:', slug);
       const supabase = await createServerSupabaseClient();
 
-      // First, check if the products table exists and has the expected structure
-      try {
-        console.log('Checking products table structure...');
-        const { data: tableInfo, error: tableError } = await supabase
-          .from('products')
-          .select('id')
-          .limit(1);
-
-        if (tableError) {
-          console.error('Error checking products table:', tableError);
-          return { error: { message: 'Database structure issue' } };
-        }
-
-        console.log('Products table check result:', tableInfo ? 'Table exists' : 'Table empty');
-      } catch (tableCheckError) {
-        console.error('Exception checking products table:', tableCheckError);
-      }
-
       // Fetch the product with all related data
-      console.log('Executing query for slug:', slug);
-      // First, check the structure of the product_images table
-      try {
-        console.log('Checking product_images table structure...');
-        const { data: imageColumns, error: imageError } = await supabase
-          .from('product_images')
-          .select('*')
-          .limit(1);
-
-        if (imageError) {
-          console.error('Error checking product_images table:', imageError);
-        } else {
-          console.log('product_images columns:', imageColumns && imageColumns.length > 0 ? Object.keys(imageColumns[0]) : 'No data');
-        }
-      } catch (e) {
-        console.error('Exception checking product_images table:', e);
-      }
-
-      // Fetch the product with all related data, but only select columns we know exist
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -108,14 +70,7 @@ export const ProductService = {
         .eq('slug', slug)
         .single();
 
-      console.log('Query result:', { hasData: !!data, error: error || 'No error' });
-
       if (error || !data) {
-        console.error('Error fetching product by slug:', error || 'No data returned');
-
-        // Log the error for debugging purposes
-        console.log('Error details:', error);
-
         return { error: { message: 'Failed to fetch product' } };
       }
 
@@ -131,7 +86,7 @@ export const ProductService = {
           specifications = specs;
         }
       } catch (error) {
-        console.error('Error fetching specifications:', error);
+        // Silently fail - specifications are optional
       }
 
       // Process the data to match the expected format
@@ -151,11 +106,8 @@ export const ProductService = {
         machineDimensions: data.machine_dimensions || '',
         weight: data.weight || '',
         isFeatured: data.is_featured || false,
-        // Add specifications
         specifications,
-        // Add empty reviews array (could be fetched from a reviews table if it exists)
         reviews: [],
-        // Add empty applications object (could be fetched from a separate table if it exists)
         applications: {
           furniture: 'Sản xuất nội thất, tủ bếp, cửa gỗ, bàn ghế',
           interiorDecoration: 'Trang trí nội thất, ốp tường, trần nghệ thuật',
@@ -177,9 +129,9 @@ export const ProductService = {
 
       // Process images to ensure they have the expected format
       if (processedProduct.images) {
-        processedProduct.images = processedProduct.images.map(img => ({
+        processedProduct.images = processedProduct.images.map((img: any) => ({
           ...img,
-          alt: processedProduct.name, // Use product name as alt text since alt_text column doesn't exist
+          alt: processedProduct.name,
           isPrimary: img.is_primary
         }));
       } else {
@@ -188,7 +140,6 @@ export const ProductService = {
 
       return { data: processedProduct };
     } catch (error) {
-      console.error('Error in getProductBySlug:', error);
       return { error: { message: 'An unexpected error occurred' } };
     }
   },

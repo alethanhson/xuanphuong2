@@ -10,41 +10,68 @@ CREATE TABLE IF NOT EXISTS public.website_settings (
 -- Enable Row Level Security
 ALTER TABLE public.website_settings ENABLE ROW LEVEL SECURITY;
 
--- Create policies
-CREATE POLICY "Website settings are viewable by everyone" 
-  ON public.website_settings 
-  FOR SELECT 
-  USING (true);
+-- Create policies using DO block to check if they exist first
+DO $$
+BEGIN
+  -- Create select policy if not exists
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'website_settings' AND policyname = 'Website settings are viewable by everyone'
+  ) THEN
+    CREATE POLICY "Website settings are viewable by everyone" 
+      ON public.website_settings 
+      FOR SELECT 
+      USING (true);
+  END IF;
 
-CREATE POLICY "Website settings are insertable by admins" 
-  ON public.website_settings 
-  FOR INSERT 
-  WITH CHECK (
-    auth.role() = 'authenticated' AND EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  -- Create insert policy if not exists
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'website_settings' AND policyname = 'Website settings are insertable by admins'
+  ) THEN
+    CREATE POLICY "Website settings are insertable by admins" 
+      ON public.website_settings 
+      FOR INSERT 
+      WITH CHECK (
+        auth.role() = 'authenticated' AND EXISTS (
+          SELECT 1 FROM public.profiles
+          WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+        )
+      );
+  END IF;
 
-CREATE POLICY "Website settings are updatable by admins" 
-  ON public.website_settings 
-  FOR UPDATE 
-  USING (
-    auth.role() = 'authenticated' AND EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  -- Create update policy if not exists
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'website_settings' AND policyname = 'Website settings are updatable by admins'
+  ) THEN
+    CREATE POLICY "Website settings are updatable by admins" 
+      ON public.website_settings 
+      FOR UPDATE 
+      USING (
+        auth.role() = 'authenticated' AND EXISTS (
+          SELECT 1 FROM public.profiles
+          WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+        )
+      );
+  END IF;
 
-CREATE POLICY "Website settings are deletable by admins" 
-  ON public.website_settings 
-  FOR DELETE 
-  USING (
-    auth.role() = 'authenticated' AND EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  -- Create delete policy if not exists
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'website_settings' AND policyname = 'Website settings are deletable by admins'
+  ) THEN
+    CREATE POLICY "Website settings are deletable by admins" 
+      ON public.website_settings 
+      FOR DELETE 
+      USING (
+        auth.role() = 'authenticated' AND EXISTS (
+          SELECT 1 FROM public.profiles
+          WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+        )
+      );
+  END IF;
+END $$;
 
 -- Insert initial hero section settings
 INSERT INTO public.website_settings (key, value)

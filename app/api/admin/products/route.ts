@@ -28,15 +28,12 @@ export async function GET() {
     `
       )
       .order('created_at', { ascending: false });
-    console.log(products);
 
     if (error) {
-      console.error('Error fetching products:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     if (!Array.isArray(products)) {
-      console.error('Invalid products data:', products);
       return NextResponse.json(
         { error: 'Invalid products data' },
         { status: 500 }
@@ -71,7 +68,6 @@ export async function GET() {
       total: formattedProducts.length,
     });
   } catch (error) {
-    console.error('Server error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

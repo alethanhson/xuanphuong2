@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import ClientLayout from '@/components/client-layout';
 import AdminClientWrapper from '@/components/admin/admin-client-wrapper';
+import AnalyticsProvider from '@/components/analytics-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -21,10 +22,12 @@ export default function AdminLayout({
       <body suppressHydrationWarning>
         <ClientLayout>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <AdminClientWrapper>
-              {children}
-            </AdminClientWrapper>
-            <Toaster />
+            <AnalyticsProvider>
+              <AdminClientWrapper>
+                {children}
+              </AdminClientWrapper>
+              <Toaster />
+            </AnalyticsProvider>
           </ThemeProvider>
         </ClientLayout>
       </body>

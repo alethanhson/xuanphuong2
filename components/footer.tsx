@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-10 sm:py-12">
         <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">CNC Future</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Tân Tiến Vinh</h3>
             <p className="mb-4 text-sm sm:text-base">
               Chuyên cung cấp máy móc CNC hiện đại cho ngành gỗ và kim loại, nâng cao hiệu suất sản xuất.
             </p>
@@ -183,7 +183,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-zinc-800 mt-8 pt-6 text-center text-sm sm:text-base">
-          <p>&copy; 2025 CNC Future. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; 2025 Tân Tiến Vinh. Tất cả quyền được bảo lưu.</p>
         </div>
       </div>
     </footer>

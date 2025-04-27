@@ -7,23 +7,24 @@ import Footer from "@/components/footer"
 import ScrollToTop from "@/components/scroll-to-top"
 import { Toaster } from "@/components/ui/toaster"
 import ClientLayout from "@/components/client-layout"
+import AnalyticsProvider from "@/components/analytics-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
-  title: "CNC Future - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
+  title: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
   description:
-    "CNC Future chuyên cung cấp máy móc CNC gia công gỗ và kim loại, giải pháp sản xuất thông minh nâng cao hiệu suất. Tư vấn, thiết kế, lắp đặt và bảo trì chuyên nghiệp.",
-  keywords: "CNC, máy CNC, gia công gỗ, gia công kim loại, máy CNC gỗ, máy CNC kim loại, giải pháp sản xuất",
-  authors: [{ name: "CNC Future" }],
+    "Tân Tiến Vinh chuyên cung cấp máy móc CNC gia công gỗ và kim loại, giải pháp sản xuất thông minh nâng cao hiệu suất. Tư vấn, thiết kế, lắp đặt và bảo trì chuyên nghiệp.",
+  keywords: ["máy cnc", "cnc gỗ", "cnc kim loại", "thiết bị cnc", "công nghệ cnc"],
+  authors: [{ name: "Tân Tiến Vinh" }],
   robots: "index, follow",
   openGraph: {
-    title: "CNC Future - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
+    title: "Tân Tiến Vinh - Giải Pháp CNC Gỗ & Kim Loại Hàng Đầu Việt Nam",
     description:
-      "Chuyên cung cấp máy móc CNC gia công gỗ và kim loại, giải pháp sản xuất thông minh nâng cao hiệu suất.",
+      "Chuyên cung cấp máy CNC chất lượng cao, dịch vụ tư vấn, lắp đặt và bảo trì cho ngành gỗ và kim loại tại Việt Nam.",
     url: "https://cncfuture.com",
-    siteName: "CNC Future",
+    siteName: "Tân Tiến Vinh",
     locale: "vi_VN",
     type: "website",
   },
@@ -38,11 +39,13 @@ export default function RootLayout({
     <html lang="vi">
       <body className={inter.className}>
         <ClientLayout>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <ScrollToTop />
-          <Toaster />
+          <AnalyticsProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <ScrollToTop />
+            <Toaster />
+          </AnalyticsProvider>
         </ClientLayout>
       </body>
     </html>

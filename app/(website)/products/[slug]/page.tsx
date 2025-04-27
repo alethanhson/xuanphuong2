@@ -81,7 +81,14 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
     }
 
     console.log('Product fetched successfully:', response.data.name);
-    const product = response.data
+    const product = response.data;
+
+    if (!product) {
+      // This case should ideally be caught by the notFound() call above,
+      // but adding an explicit check for TypeScript safety.
+      console.error('Product is undefined after fetch, despite no explicit error.');
+      notFound(); // Ensure notFound is called if product is unexpectedly undefined
+    }
 
     return (
     <>

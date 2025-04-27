@@ -32,8 +32,8 @@ export function formatPrice(price: number) {
 }
 
 export function constructMetadata({
-  title = "CNC Future - Giải Pháp CNC Toàn Diện",
-  description = "CNC Future cung cấp giải pháp máy CNC chất lượng cao cho ngành gỗ và kim loại tại Việt Nam",
+  title = "Tân Tiến Vinh - Giải Pháp CNC Toàn Diện",
+  description = "Tân Tiến Vinh cung cấp giải pháp máy CNC chất lượng cao cho ngành gỗ và kim loại tại Việt Nam",
   keywords = [],
   image = "/og-image.jpg",
   icons = [
@@ -59,7 +59,7 @@ export function constructMetadata({
     title,
     description,
     keywords: keywords.join(", "),
-    authors: [{ name: "CNC Future" }],
+    authors: [{ name: "Tân Tiến Vinh" }],
     metadataBase: new URL("https://cncfuture.com"),
     alternates: {
       canonical: "/",

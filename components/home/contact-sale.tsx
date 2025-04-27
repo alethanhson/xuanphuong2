@@ -20,7 +20,7 @@ export default function ContactSale() {
               <div className="bg-zinc-100 p-8 rounded-xl h-full">
                 <h3 className="text-2xl font-bold mb-6">Thông Tin Liên Hệ</h3>
                 <div className="text-zinc-600 mb-8">
-                  Hãy liên hệ ngay với chúng tôi để được tư vấn miễn phí. Đội ngũ chuyên gia của CNC Future luôn sẵn
+                  Hãy liên hệ ngay với chúng tôi để được tư vấn miễn phí. Đội ngũ chuyên gia của Tân Tiến Vinh luôn sẵn
                   sàng hỗ trợ bạn.
                 </div>
 

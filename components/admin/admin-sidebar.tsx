@@ -206,7 +206,7 @@ const MobileSidebar = ({ pathname }: { pathname: string }) => {
           <div className="flex h-[60px] items-center border-b px-6">
             <Link href="/admin" className="flex items-center gap-2 font-semibold">
               <Package2 className="h-6 w-6" />
-              <span className="">CNC Future Admin</span>
+              <span className="">Tân Tiến Vinh Admin</span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-2">
@@ -251,7 +251,7 @@ export default function AdminSidebar() {
           <div className="flex h-[60px] items-center border-b px-6">
             <Link href="/admin" className="flex items-center gap-2 font-semibold">
               <Package2 className="h-6 w-6" />
-              <span className="">CNC Future Admin</span>
+              <span className="">Tân Tiến Vinh Admin</span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-2">

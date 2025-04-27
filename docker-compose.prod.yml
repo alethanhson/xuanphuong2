@@ -9,11 +9,14 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+      # - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
     networks:
       - app_network_prod
+    env_file:
+      - .env
 
   nginx:
     container_name: xuanphuong2_nginx_prod

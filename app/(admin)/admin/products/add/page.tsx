@@ -1,8 +1,6 @@
 'use client';
 
-import type React from 'react';
-
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -95,6 +93,12 @@ const formSteps = [
   { id: 'documents', label: 'Tài liệu' },
 ];
 
+// Thêm biến để kiểm soát debug logging
+const MODE_DEBUG = process.env.NODE_ENV === 'development';
+// Thêm biến để kiểm soát tần suất validation
+const VALIDATION_DEBOUNCE_MS = 500; // Tăng thời gian debounce
+const VALIDATION_THROTTLE_MS = 1000; // Thêm thời gian throttle
+
 export default function AddProductPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
@@ -127,6 +131,13 @@ export default function AddProductPage() {
   const [stepValidationState, setStepValidationState] = useState<boolean[]>(
     Array(formSteps.length).fill(false)
   );
+  // Thêm tham chiếu để theo dõi timer debounce
+  const validationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Thêm state để theo dõi trạng thái nhập liệu và tránh validate không cần thiết
+  const [isDirty, setIsDirty] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const lastValidateTimeRef = useRef<number>(0);
+  const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // References for the first fields of each step
   const firstInputRefs = useRef<Array<HTMLInputElement | null>>(
@@ -203,10 +214,28 @@ export default function AddProductPage() {
 
   // Function to validate the current step
   const validateCurrentStep = async (): Promise<boolean> => {
-    console.log('Validating step:', currentStep);
-    let isValid = false;
+    const now = Date.now();
+    
+    // Kiểm tra throttle - nếu thời gian từ lần validate cuối quá ngắn, skip
+    if (now - lastValidateTimeRef.current < VALIDATION_THROTTLE_MS) {
+      if (MODE_DEBUG) console.log('Throttle: skipping validation');
+      return stepValidationState[currentStep]; // Giữ nguyên kết quả hiện tại
+    }
+
+    // Cập nhật thời gian validate cuối
+    lastValidateTimeRef.current = now;
+
+    // Tránh nhiều validate chạy đồng thời
+    if (isValidating) {
+      if (MODE_DEBUG) console.log('Already validating, skipping');
+      return stepValidationState[currentStep];
+    }
 
     try {
+      if (MODE_DEBUG) console.log('Validating step:', currentStep);
+      setIsValidating(true);
+      let isValid = false;
+
       switch (currentStep) {
         case 0: // Basic information
           // Trigger validation for required fields in the first step
@@ -215,9 +244,9 @@ export default function AddProductPage() {
           // Check if there are any errors in these fields
           const errors = form.formState.errors;
           isValid = !errors.name && !errors.slug && !errors.description &&
-                   !errors.category_id && !errors.status;
+                 !errors.category_id && !errors.status;
 
-          console.log('Basic info validation errors:', errors);
+          MODE_DEBUG && errors && console.log('Basic info validation errors:', Object.keys(errors));
           break;
         case 1: // Images
           // Images are optional, but if there are any, there must be a primary one
@@ -242,39 +271,109 @@ export default function AddProductPage() {
         default:
           isValid = false;
       }
+
+      // Chỉ cập nhật state nếu kết quả thực sự thay đổi
+      if (stepValidationState[currentStep] !== isValid) {
+        const newStepValidationState = [...stepValidationState];
+        newStepValidationState[currentStep] = isValid;
+        setStepValidationState(newStepValidationState);
+        
+        if (MODE_DEBUG) console.log('Step validation result:', isValid);
+      }
+      
+      return isValid;
     } catch (error) {
-      console.error('Validation error:', error);
-      isValid = false;
+      console.error('Validation error:', error instanceof Error ? error.message : 'Unknown error');
+      return false;
+    } finally {
+      setIsValidating(false);
     }
-
-    // Update the validation state of the current step
-    const newStepValidationState = [...stepValidationState];
-    newStepValidationState[currentStep] = isValid;
-    setStepValidationState(newStepValidationState);
-
-    console.log('Step validation result:', isValid);
-    return isValid;
   };
+
+  // Debouncedfunction to validate with delay
+  const debouncedValidateStep = useCallback(() => {
+    // Đặt trạng thái form là đã thay đổi
+    setIsDirty(true);
+    
+    // Xóa timer hiện tại nếu có
+    if (validationTimerRef.current) {
+      clearTimeout(validationTimerRef.current);
+      validationTimerRef.current = null;
+    }
+    
+    // Tạo timer mới
+    validationTimerRef.current = setTimeout(() => {
+      // Chỉ validate khi form đã thay đổi
+      if (isDirty) {
+        validateCurrentStep();
+        setIsDirty(false);
+      }
+    }, VALIDATION_DEBOUNCE_MS);
+  }, [currentStep, isDirty]);
 
   // Validate the current step when form values change
   useEffect(() => {
-    const subscription = form.watch(() => {
+    // Tạo một bản sao đơn giản của hàm watch để giảm số lần gọi
+    const handleFormChange = () => {
+      // Sử dụng throttle để giới hạn tần suất xử lý
+      if (throttleTimerRef.current) return;
+      
+      throttleTimerRef.current = setTimeout(() => {
+        debouncedValidateStep();
+        throttleTimerRef.current = null;
+      }, 100);
+    };
+    
+    const subscription = form.watch(handleFormChange);
+
+    // Validate lần đầu và khi thay đổi step
+    const initialValidation = setTimeout(() => {
       validateCurrentStep();
-    });
+    }, 500);
 
-    // Also validate when images or features change
-    validateCurrentStep();
+    return () => {
+      subscription.unsubscribe();
+      // Xóa timer khi cleanup
+      if (validationTimerRef.current) {
+        clearTimeout(validationTimerRef.current);
+      }
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+      }
+      clearTimeout(initialValidation);
+    };
+  }, [currentStep, debouncedValidateStep, form]);
 
-    return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, images, features]);
+  // Bổ sung effect riêng để theo dõi images và features
+  useEffect(() => {
+    const validateForImagesAndFeatures = setTimeout(() => {
+      if (currentStep === 1 || currentStep === 2) {
+        validateCurrentStep();
+      }
+    }, 300);
+    
+    return () => clearTimeout(validateForImagesAndFeatures);
+  }, [images, features, currentStep]);
 
   // Function to advance to the next step
   const goToNextStep = async () => {
+    // Xóa timer hiện tại nếu có
+    if (validationTimerRef.current) {
+      clearTimeout(validationTimerRef.current);
+      validationTimerRef.current = null;
+    }
+    
+    if (throttleTimerRef.current) {
+      clearTimeout(throttleTimerRef.current);
+      throttleTimerRef.current = null;
+    }
+    
+    // Validate ngay lập tức mà không debounce
     const isValid = await validateCurrentStep();
 
     if (isValid && currentStep < formSteps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setIsDirty(true); // Đánh dấu là cần validate step mới
 
       // Focus the first field of the new step
       setTimeout(() => {
@@ -368,8 +467,6 @@ export default function AddProductPage() {
     setNewFeatureDescription('');
     setNewFeatureIcon('');
   };
-
-
 
   // Remove feature
   const removeFeature = (id: string) => {
@@ -481,7 +578,7 @@ export default function AddProductPage() {
 
           if (!error) {
             // If successful, the metadata column exists
-            console.log('Product created successfully with metadata:', product);
+            MODE_DEBUG && console.log('Product created with metadata');
 
             // Show success message
             toast({
@@ -494,15 +591,15 @@ export default function AddProductPage() {
             return product;
           } else if (error.message.includes("metadata")) {
             // If error mentions metadata, the column might not exist
-            console.log('Metadata column might not exist, trying without it');
+            MODE_DEBUG && console.log('Metadata column might not exist, trying without it');
             throw error; // Proceed to fallback approach
           } else {
-            // Some other error occurred
-            console.error('Error creating product:', error);
+            // Some other error occurred - chỉ log lỗi nghiêm trọng
+            console.error('Lỗi tạo sản phẩm:', error.message);
             throw error;
           }
         } catch (metadataError) {
-          console.log('Falling back to basic product creation');
+          if (MODE_DEBUG) console.log('Falling back to basic product creation');
 
           // Fallback: Insert product without metadata
           const { data: product, error } = await supabase
@@ -512,7 +609,7 @@ export default function AddProductPage() {
             .single();
 
           if (error) {
-            console.error('Error creating basic product:', error);
+            console.error('Lỗi tạo sản phẩm cơ bản:', error.message);
             throw error;
           }
 
@@ -532,7 +629,7 @@ export default function AddProductPage() {
                 .from('product_features')
                 .insert(featureInserts as any)
                 .then(({ error }) => {
-                  if (error) console.log('Could not insert features, might be expected');
+                  if (error && MODE_DEBUG) console.log('Could not insert features');
                 });
             }
 
@@ -550,14 +647,14 @@ export default function AddProductPage() {
                 .from('product_images')
                 .insert(imageInserts as any)
                 .then(({ error }) => {
-                  if (error) console.log('Could not insert images, might be expected');
+                  if (error && MODE_DEBUG) console.log('Could not insert images');
                 });
             }
           } catch (relatedDataError) {
-            console.log('Could not store related data, continuing anyway');
+            MODE_DEBUG && console.log('Could not store related data');
           }
 
-          console.log('Product created successfully without metadata:', product);
+          MODE_DEBUG && console.log('Product created without metadata');
 
           // Show success message
           toast({
@@ -570,13 +667,13 @@ export default function AddProductPage() {
           return product;
         }
       } catch (error) {
-        console.error('Error in product creation process:', error);
+        console.error('Lỗi trong quá trình tạo sản phẩm:', error instanceof Error ? error.message : 'Lỗi không xác định');
         throw error;
       }
 
       // Success toast and redirect are now handled in the success branches above
     } catch (error) {
-      console.error(error);
+      console.error('Lỗi:', error instanceof Error ? error.message : 'Lỗi không xác định');
       toast({
         title: 'Lỗi!',
         description: 'Đã xảy ra lỗi khi tạo sản phẩm.',

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
+// Thêm biến kiểm soát debug logging
+const MODE_DEBUG = process.env.NODE_ENV === 'development';
+
 type Product = {
   id: string;
   name: string;
@@ -97,7 +100,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Error creating product:', error);
+      console.error('Lỗi tạo sản phẩm:', error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -114,7 +117,8 @@ export async function POST(request: Request) {
         .insert(imageInserts);
 
       if (imageError) {
-        console.error('Error adding product images:', imageError);
+        // Chỉ log lỗi thêm hình ảnh khi cần thiết
+        console.error('Lỗi thêm hình ảnh sản phẩm:', imageError.message);
       }
     }
 
@@ -131,7 +135,8 @@ export async function POST(request: Request) {
         .insert(featureInserts);
 
       if (featureError) {
-        console.error('Error adding product features:', featureError);
+        // Chỉ log lỗi thêm tính năng khi cần thiết
+        console.error('Lỗi thêm tính năng sản phẩm:', featureError.message);
       }
     }
 
@@ -144,7 +149,8 @@ export async function POST(request: Request) {
       product: product,
     });
   } catch (error) {
-    console.error('Server error:', error);
+    // Log lỗi server với thông tin chi tiết hơn
+    console.error('Lỗi server:', error instanceof Error ? error.message : 'Lỗi không xác định');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

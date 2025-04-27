@@ -1,12 +1,23 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { useDropzone } from "react-dropzone"
 import { ImageIcon, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image"
 import imageCompression from "browser-image-compression"
+
+// Kiểm soát việc ghi log debug
+const MODE_DEBUG = process.env.NODE_ENV === 'development';
+
+// Cấu hình nén ảnh
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true,
+  fileType: 'image/jpeg',
+}
 
 interface ImageUploadProps {
   onImagesChange: (images: { id: string; url: string; alt: string; isPrimary: boolean }[]) => void
@@ -21,11 +32,8 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
     try {
       setUploading(true)
 
-      // Compress image before uploading
-      const compressedFile = await imageCompression(file, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-      })
+      // Nén ảnh trước khi tải lên
+      const compressedFile = await imageCompression(file, COMPRESSION_OPTIONS)
 
       const formData = new FormData()
       formData.append("file", compressedFile)
@@ -35,7 +43,6 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
         body: formData,
       })
       
-
       if (!response.ok) {
         throw new Error("Upload failed")
       }
@@ -49,11 +56,12 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
         isPrimary: images.length === 0,
       }
     } catch (error) {
-      console.error("Error uploading image:", error)
+      // Chỉ log lỗi quan trọng
+      console.error("Lỗi tải lên hình ảnh:", error instanceof Error ? error.message : "Lỗi không xác định")
       toast({
         variant: "destructive",
-        title: "Upload failed",
-        description: "There was an error uploading your image. Please try again.",
+        title: "Tải lên thất bại",
+        description: "Đã xảy ra lỗi khi tải lên hình ảnh. Vui lòng thử lại.",
       })
       return null
     } finally {
@@ -68,6 +76,7 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
       setUploading(true)
 
       try {
+        // Tạo mảng promise để tải lên nhiều file cùng lúc
         const uploadPromises = acceptedFiles.map((file) => uploadImage(file))
         const uploadedImages = await Promise.all(uploadPromises)
 
@@ -84,11 +93,12 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
           onImagesChange(newImages)
         }
       } catch (error) {
-        console.error("Error processing images:", error)
+        // Chỉ log lỗi quan trọng
+        console.error("Lỗi xử lý hình ảnh:", error instanceof Error ? error.message : "Lỗi không xác định")
         toast({
           variant: "destructive",
-          title: "Upload failed",
-          description: "There was an error processing your images. Please try again.",
+          title: "Tải lên thất bại",
+          description: "Đã xảy ra lỗi khi xử lý hình ảnh. Vui lòng thử lại.",
         })
       } finally {
         setUploading(false)
@@ -103,12 +113,13 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
       "image/*": [".png", ".jpg", ".jpeg", ".webp"],
     },
     disabled: uploading,
+    maxSize: 5 * 1024 * 1024, // 5MB limit
   })
 
   const removeImage = (id: string) => {
     const updatedImages = images.filter((image) => image.id !== id)
 
-    // If we removed the primary image, make the first remaining image primary
+    // Nếu xóa hình ảnh chính, đặt hình ảnh đầu tiên còn lại làm hình ảnh chính
     if (updatedImages.length > 0 && !updatedImages.some((img) => img.isPrimary)) {
       updatedImages[0].isPrimary = true
     }
@@ -134,6 +145,50 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
     onImagesChange(updatedImages)
   }
 
+  // Tối ưu hiệu suất với useMemo
+  const imagesList = useMemo(() => {
+    return images.map((image) => (
+      <div key={image.id} className="relative border rounded-md overflow-hidden">
+        <div className="aspect-video relative">
+          <Image
+            src={image.url}
+            alt={image.alt}
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="p-2 flex flex-col gap-2">
+          <input
+            type="text"
+            value={image.alt}
+            onChange={(e) => updateImageAlt(image.id, e.target.value)}
+            placeholder="Mô tả hình ảnh"
+            className="px-2 py-1 border rounded text-sm"
+          />
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              size="sm"
+              variant={image.isPrimary ? "default" : "outline"}
+              onClick={() => setPrimaryImage(image.id)}
+              disabled={image.isPrimary}
+            >
+              {image.isPrimary ? "Hình chính" : "Đặt làm chính"}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              onClick={() => removeImage(image.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    ));
+  }, [images]);
+
   return (
     <div className="space-y-4">
       <div
@@ -157,48 +212,8 @@ export function ImageUpload({ onImagesChange, initialImages = [] }: ImageUploadP
       </div>
 
       {images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {images.map((image) => (
-            <div key={image.id} className="relative group border rounded-lg overflow-hidden">
-              <div className="aspect-square relative">
-                <Image src={image.url || "/placeholder.svg"} alt={image.alt} fill className="object-cover" />
-                {image.isPrimary && (
-                  <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">Ảnh chính</div>
-                )}
-              </div>
-              <div className="p-2">
-                <input
-                  type="text"
-                  value={image.alt}
-                  onChange={(e) => updateImageAlt(image.id, e.target.value)}
-                  className="w-full text-sm p-1 border rounded"
-                  placeholder="Mô tả ảnh"
-                />
-              </div>
-              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => removeImage(image.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              {!image.isPrimary && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="absolute bottom-12 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => setPrimaryImage(image.id)}
-                >
-                  Đặt làm ảnh chính
-                </Button>
-              )}
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {imagesList}
         </div>
       )}
     </div>

@@ -1,29 +1,66 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Tệp tin và thư mục của hệ thống
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# dependencies
-/node_modules
+# Thư mục cài đặt của IDE và trình soạn thảo
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.settings/
+.project
+.classpath
 
-# next.js
-/.next/
-/out/
+# Dependency directories
+node_modules/
 
-# production
-/build
+# Thư mục build và cache
+.next/
+out/
+dist/
+build/
+coverage/
 
-# debug
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*
+# Các tệp tin môi trường
+.env
+.env.*
+!.env.example
 
-# vercel
-.vercel
+# Tệp tin tạm thời
+*.tmp
+*.temp
+.temp/
+.tmp/
 
-# typescript
+# Docker related
+.docker/
+.docker-sync/
+docker-compose.override.yml
+
+# Các tệp tin debug
+debug/
+.debug/
+
+# Các tệp tin bảo mật
+*.pem
+*.key
+*.cert
+*.crt
+
+# Typescript
 *.tsbuildinfo
 next-env.d.ts
 
-/supabase/.temp
+# Thư mục và tệp tin đặc biệt khác
+.github/
+.vercel/
+.cursor/ 

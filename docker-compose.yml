@@ -1,44 +1,57 @@
-version: '3'
+version: '3.8'
 
 services:
-  nextjs:
-    container_name: xuanphuong2
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/backend/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - DB_TYPE=sqlite
+      - DB_DATABASE=database.sqlite
+      - JWT_SECRET=your_jwt_secret_key
+      - NODE_ENV=development
+      - PORT=3001
+      - HOST=0.0.0.0
+      - TS_NODE_TRANSPILE_ONLY=true
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+      - sqlite_data:/usr/src/app/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
     restart: always
     ports:
       - '3000:3000'
-    volumes:
-      - .:/app
-      - /app/.next
-      - /app/node_modules
-      - ./start.sh:/app/start.sh
-    command: sh -c "chmod +x /app/start.sh && /app/start.sh"
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-    networks:
-      - app_network
-
-  nginx:
-    container_name: xuanphuong2_nginx
-    image: nginx:alpine
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./nginx/conf:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/www:/var/www/html
     depends_on:
-      - nextjs
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     networks:
-      - app_network
+      - app-network
 
 networks:
-  app_network:
+  app-network:
     driver: bridge
+
+volumes:
+  sqlite_data:
 

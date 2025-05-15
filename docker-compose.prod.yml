@@ -1,38 +1,53 @@
+version: '3.8'
+
 services:
-  nextjs:
-    container_name: xuanphuong2_prod
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/backend/Dockerfile
+      target: production
+    restart: always
+    expose:
+      - '3001'
+    environment:
+      - DB_TYPE=sqlite
+      - DB_DATABASE=database.sqlite
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+    volumes:
+      - sqlite_data:/usr/src/app/data
+    command: node dist/main
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
+      target: production
     restart: always
     ports:
-      - '3000:3000'
-    environment:
-      - NEXT_PUBLIC_SUPABASE_URL=https://gmyetawqyweglcnqfkew.supabase.co
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteWV0YXdxeXdlZ2xjbnFma2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3NjcxNzQsImV4cCI6MjA1NzM0MzE3NH0.NoQR8zaDS5S38qsivVNK-YwQNRJU7_l68dzoCsv8wz0
-      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteWV0YXdxeXdlZ2xjbnFma2V3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTc2NzE3NCwiZXhwIjoyMDU3MzQzMTc0fQ.thRg2k0kkYE5SMg1NFF8YGzVAq4s6afMGxNa7tzf6Wc
-      - NODE_ENV=production
-      - NEXT_PUBLIC_BASE_URL=https://tantienvinh.com
-    networks:
-      - app_network_prod
-    env_file:
-      - .env
-
-  nginx:
-    container_name: xuanphuong2_nginx_prod
-    image: nginx:alpine
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./nginx/conf:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/www:/var/www/html
+      - '80:3000'
+      - '443:3000'
     depends_on:
-      - nextjs
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=https://${DOMAIN}/api
+      - NODE_ENV=production
     networks:
-      - app_network_prod
+      - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
 networks:
-  app_network_prod:
-    driver: bridge 
+  app-network:
+    driver: bridge
+
+volumes:
+  sqlite_data: 

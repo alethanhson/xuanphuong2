@@ -1,28 +1,52 @@
+version: '3.8'
+
 services:
-  nextjs:
-    container_name: xuanphuong2_dev
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: ./docker/backend/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - DB_TYPE=sqlite
+      - DB_DATABASE=database.sqlite
+      - JWT_SECRET=${JWT_SECRET:-secret_key}
+      - NODE_ENV=development
     volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+      - sqlite_data:/usr/src/app/data
+    command: node dist/server.js
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
+      target: development
+    restart: always
     ports:
       - '3000:3000'
+    depends_on:
+      - backend
     environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
       - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
     networks:
-      - app_network_dev
-    # Hỗ trợ hot-reload
-    stdin_open: true
-    tty: true
+      - app-network
 
 networks:
-  app_network_dev:
-    driver: bridge 
+  app-network:
+    driver: bridge
+
+volumes:
+  sqlite_data: 
